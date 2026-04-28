@@ -39,6 +39,7 @@
     "reliability:weekly": "npm run evals && npm run reliability:changelog",
     "verify:dev-keys": "node scripts/verify-dev-api-keys.mjs",
     "report:dev-usage": "node scripts/report-dev-api-usage.mjs",
+    "verify:scorecards": "node scripts/enforce-scorecard-thresholds.mjs",
     "verify:package": "node scripts/verify-package.mjs",
     "smoke": "node scripts/smoke.mjs"
   },

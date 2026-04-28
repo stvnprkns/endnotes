@@ -40,6 +40,9 @@ jobs:
       - name: Comparison scorecard generation
         run: npm run evals:compare --if-present
 
+      - name: Scorecard threshold enforcement
+        run: npm run verify:scorecards --if-present
+
       - name: Build library
         run: npm run build --if-present
 

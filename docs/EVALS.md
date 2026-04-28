@@ -97,3 +97,21 @@ Current named profiles:
 - `manual_footnotes` (simulated manual footnote workflow)
 
 Note: comparison alternatives are synthetic behavior profiles for transparent benchmarking shape and regression tracking. They are not live measurements against third-party APIs.
+
+## CI threshold enforcement
+
+CI enforces scorecard quality with:
+
+```bash
+npm run verify:scorecards
+```
+
+Current enforced checks:
+
+- public scorecard thresholds (`passRate`, `publishableRate`, `manualReviewRate`, `trustDecisionAccuracy`)
+- Endnotes must rank first in comparison scorecard
+- Endnotes must lead runner-up by at least 10 percentage points in `passRate`
+
+## Artifact policy
+
+Generated report files in `evals/reports/*.json` are treated as runtime artifacts and are uploaded by CI. They are not source-of-truth files and are ignored in Git, except `evals/reports/.gitkeep`.
