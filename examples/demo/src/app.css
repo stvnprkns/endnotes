@@ -1,0 +1,637 @@
+:root {
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  background: #ffffff;
+}
+
+.demo-root {
+  /* One column for header + main; 100vw keeps the same number wherever % bases differ. */
+  --demo-content-width: min(42rem, calc(100vw - 2rem));
+
+  --background: #ffffff;
+  --foreground: #111111;
+  --muted-foreground: #555555;
+  --border: #e8e8e8;
+  --surface: #ffffff;
+  --primary: #111111;
+  --radius: 10px;
+  --focus: color-mix(in oklab, var(--primary) 42%, transparent);
+  --endnotes-rule: #e5e7eb;
+  --endnotes-link: #2563eb;
+  --endnotes-link-hover: #1d4ed8;
+  --endnotes-citation: #72777a;
+  --endnotes-heading-color: var(--foreground);
+
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.demo-root.dark {
+  --background: #0a0a0a;
+  --foreground: #fafafa;
+  --muted-foreground: #a3a3a3;
+  --border: #2a2a2a;
+  --surface: #111111;
+  --primary: #fafafa;
+  --endnotes-rule: #404040;
+  --endnotes-link: #60a5fa;
+  --endnotes-link-hover: #93c5fd;
+  --endnotes-citation: #a3a3a3;
+  --endnotes-heading-color: var(--foreground);
+}
+
+.site-header {
+  position: relative;
+  z-index: 2;
+  padding: 1.35rem 1rem 0.5rem;
+  border-bottom: 0;
+  background: var(--background);
+}
+
+.site-header-inner {
+  width: var(--demo-content-width);
+  max-width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 1.25rem;
+}
+
+.wordmark {
+  color: var(--foreground);
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.site-header nav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.65rem;
+  justify-content: flex-end;
+  flex: 1;
+  min-width: min(100%, 12rem);
+}
+
+.site-header nav a {
+  color: var(--muted-foreground);
+  text-decoration: none;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0.15rem 0;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  font-weight: 500;
+  transition: color 140ms ease, text-decoration-color 140ms ease;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.18em;
+}
+
+.site-header nav a:hover,
+.site-header nav a:focus-visible {
+  color: var(--foreground);
+  text-decoration-color: color-mix(in oklab, var(--foreground) 35%, transparent);
+  outline: none;
+}
+
+.demo-shell {
+  width: var(--demo-content-width);
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 2.75rem 1rem 5.5rem;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 3.25rem;
+}
+
+.section {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  min-width: 0;
+}
+
+.section h2 {
+  margin: 0;
+  font-size: 0.875rem;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.section p {
+  margin: 0.95rem 0 0;
+  line-height: 1.65;
+  max-width: 65ch;
+  text-wrap: pretty;
+  color: color-mix(in oklab, var(--foreground) 92%, var(--muted-foreground));
+  font-family: inherit;
+  font-size: 1.0625rem;
+}
+
+/* Long-form essay block: slightly wider rhythm than API-style sections. */
+.section--essay .essay-lede {
+  margin-top: 0.75rem;
+  max-width: 62ch;
+  font-size: 1.125rem;
+  line-height: 1.68;
+  color: color-mix(in oklab, var(--foreground) 88%, var(--muted-foreground));
+}
+
+.section--essay .pull-line {
+  margin-top: 1.35rem;
+  padding-left: 1rem;
+  border-left: 3px solid color-mix(in oklab, var(--foreground) 18%, var(--border));
+  max-width: 58ch;
+  font-size: 1.0625rem;
+  line-height: 1.62;
+  font-style: italic;
+  color: var(--muted-foreground);
+}
+
+.section--essay .essay-subhead {
+  margin: 2rem 0 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  line-height: 1.35;
+}
+
+.section--essay .essay-subhead:first-of-type {
+  margin-top: 1.5rem;
+}
+
+.section--essay .endnotes-section {
+  margin-top: 2rem;
+}
+
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.35rem;
+  min-width: 0;
+}
+
+.hero .live-demo {
+  grid-column: 1 / -1;
+}
+
+.eyebrow {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  color: var(--foreground);
+}
+
+.hero h1 {
+  margin: 0.65rem 0 0;
+  font-size: clamp(1.85rem, 4.2vw, 2.45rem);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+}
+
+.lede {
+  color: var(--muted-foreground) !important;
+  max-width: 58ch;
+  font-family: inherit !important;
+  font-size: 1.0625rem !important;
+}
+
+.install-cta {
+  margin-top: 1.5rem;
+  max-width: min(36rem, 100%);
+}
+
+.install-cta-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--foreground);
+}
+
+.install-cta-hint {
+  margin: 0 0 0.65rem;
+  font-size: 0.9375rem;
+  line-height: 1.45;
+  color: var(--muted-foreground);
+}
+
+.install-cta-row {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 10px);
+  background: var(--surface);
+  overflow: hidden;
+  box-shadow: 0 1px 2px color-mix(in oklab, var(--foreground) 5%, transparent);
+}
+
+.install-cta-command {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  padding: 0.7rem 1rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.875rem;
+  line-height: 1.35;
+  color: var(--foreground);
+  background: color-mix(in oklab, var(--background) 55%, var(--surface));
+  overflow-x: auto;
+  white-space: nowrap;
+  user-select: all;
+  border: 0;
+}
+
+.demo-root.dark .install-cta-command {
+  background: color-mix(in oklab, var(--surface) 92%, var(--foreground) 5%);
+}
+
+.install-cta-copy {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0.7rem 1.1rem;
+  border: 0;
+  border-left: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--foreground);
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.25;
+  cursor: pointer;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.install-cta-copy:hover {
+  background: color-mix(in oklab, var(--foreground) 7%, var(--surface));
+}
+
+.install-cta-copy:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--focus);
+}
+
+.theme-toggle {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--foreground);
+  border-radius: 999px;
+  padding: 0.32rem 0.75rem;
+  font: inherit;
+  font-size: 0.8125rem;
+  line-height: 1.25;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 140ms ease, background-color 140ms ease;
+}
+
+.theme-toggle:hover {
+  border-color: color-mix(in oklab, var(--foreground) 22%, var(--border));
+  background: color-mix(in oklab, var(--surface) 88%, var(--foreground) 4%);
+}
+
+.theme-toggle:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--background), 0 0 0 4px var(--focus);
+}
+
+.code-block {
+  margin: 1.2rem 0 0;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Light inset: keep readable chrome in both demo themes. */
+.code-block-panel {
+  --code-block-fg: #111827;
+  --code-block-muted: #6b7280;
+  --code-block-title: #374151;
+  --code-block-toolbar-bg: #f3f4f6;
+  --code-block-body-bg: #f9fafb;
+  --code-block-border: #e5e7eb;
+  --code-block-code-line-height: 1.28;
+
+  min-width: 0;
+  max-width: 100%;
+  border: 1px solid var(--code-block-border);
+  border-radius: var(--radius);
+  background: var(--code-block-body-bg);
+  overflow: hidden;
+}
+
+.code-block-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  padding: 0.5rem 0.75rem 0.5rem 1rem;
+  border-bottom: 1px solid var(--code-block-border);
+  background: var(--code-block-toolbar-bg);
+}
+
+.code-block-toolbar-start {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.65rem;
+  min-width: 0;
+}
+
+.code-block-label {
+  color: var(--code-block-muted);
+  font-size: 0.6875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  font-weight: 600;
+}
+
+.code-block-title {
+  color: var(--code-block-title);
+  font-size: 0.8125rem;
+  letter-spacing: -0.015em;
+  font-weight: 500;
+}
+
+.code-block-lang {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  color: var(--code-block-muted);
+  text-transform: lowercase;
+  letter-spacing: 0.02em;
+}
+
+.code-block-copy {
+  flex-shrink: 0;
+  margin: 0;
+  padding: 0.35rem 0.55rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--code-block-muted);
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.25;
+  cursor: pointer;
+  transition: color 120ms ease, background-color 120ms ease;
+}
+
+.code-block-copy:hover {
+  color: var(--code-block-fg);
+  background: rgba(17, 24, 39, 0.06);
+}
+
+.code-block-copy:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--code-block-toolbar-bg), 0 0 0 4px #2563eb;
+}
+
+.code-block-pre {
+  margin: 0;
+  padding: 0;
+  background: var(--code-block-body-bg);
+  border: 0;
+  border-radius: 0;
+}
+
+.code-block-pre-plain {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  background: transparent;
+  color: var(--code-block-fg);
+  line-height: var(--code-block-code-line-height);
+}
+
+/* Shiki wraps a <pre class="shiki">; keep panel background, not the theme canvas color. */
+.code-block-shiki pre.shiki {
+  margin: 0;
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  background-color: transparent !important;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important;
+  font-size: 0.8125rem !important;
+  line-height: var(--code-block-code-line-height) !important;
+}
+
+.code-block-shiki pre.shiki code {
+  font-family: inherit !important;
+  font-size: inherit !important;
+  line-height: inherit !important;
+  background-color: transparent !important;
+}
+
+.code-block-shiki pre.shiki code .line {
+  display: block;
+  min-height: 1lh;
+}
+
+.code-block code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 0.8125rem;
+  line-height: var(--code-block-code-line-height);
+  white-space: pre;
+}
+
+/* In-flow live examples: no card chrome (matches editorial / notes pages). */
+.live-demo {
+  margin-top: 1.65rem;
+}
+
+.live-demo-title {
+  margin: 0 0 0.45rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+}
+
+.live-demo .endnotes-section {
+  margin-top: 1.75rem;
+}
+
+.live-demo--workbench {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid color-mix(in oklab, var(--border) 88%, transparent);
+}
+
+.two-up {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.stack {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.api-group + .api-group {
+  margin-top: 1.65rem;
+}
+
+.api-group h3 {
+  margin: 0 0 0.58rem;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--muted-foreground);
+}
+
+.api-group ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0;
+}
+
+.api-group li {
+  display: grid;
+  grid-template-columns: minmax(7.4rem, 9.2rem) 1fr;
+  gap: 0.76rem;
+  align-items: start;
+  padding: 0.55rem 0;
+  border-top: 1px solid color-mix(in oklab, var(--border) 72%, transparent);
+}
+
+.api-group li:first-child {
+  border-top: 0;
+  padding-top: 0.12rem;
+}
+
+.api-group li code {
+  color: var(--foreground);
+  font-size: 0.78rem;
+  opacity: 0.92;
+}
+
+.api-group li span {
+  color: var(--muted-foreground);
+  line-height: 1.62;
+  max-width: 56ch;
+}
+
+.principles-list {
+  margin: 0.85rem 0 0;
+  padding-left: 1.15rem;
+  color: var(--muted-foreground);
+  display: grid;
+  gap: 0.65rem;
+  font-family: inherit;
+  font-size: 1.0625rem;
+}
+
+.principles-list .principles-strong {
+  font-weight: 600;
+  color: color-mix(in oklab, var(--foreground) 72%, var(--muted-foreground));
+}
+
+.muted {
+  color: var(--muted-foreground);
+}
+
+.section--reference {
+  padding-top: 0.2rem;
+}
+
+.section--workbench > p {
+  max-width: 60ch;
+}
+
+.workbench-line {
+  margin-top: 0.72rem !important;
+}
+
+.workbench-line:first-child {
+  margin-top: 0.2rem !important;
+}
+
+@media (max-width: 820px) {
+  .site-header-inner {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .site-header nav {
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .theme-toggle {
+    margin-left: auto;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .two-up {
+    grid-template-columns: 1fr;
+  }
+
+  .api-group li {
+    grid-template-columns: 1fr;
+    gap: 0.22rem;
+  }
+}
+
+@media (max-width: 680px) {
+  .demo-root {
+    --demo-content-width: min(42rem, calc(100vw - 1.5rem));
+  }
+
+  .site-header {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .demo-shell {
+    padding: 1.75rem 0.75rem 3rem;
+    gap: 2.25rem;
+  }
+
+  .section {
+    padding: 0;
+    border-radius: 0;
+  }
+
+  .site-header nav a {
+    font-size: 0.78rem;
+  }
+}

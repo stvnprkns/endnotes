@@ -1,0 +1,5 @@
+node_modules/
+tmp/
+*.tgz
+smoke/vite-react/node_modules/
+smoke/vite-react/dist/

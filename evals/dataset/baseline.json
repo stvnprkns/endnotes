@@ -1,0 +1,17 @@
+[
+  {
+    "id": "eval_001",
+    "draft": "Renewable energy investment increased globally in 2025.",
+    "requiredSignals": ["numeric_endnotes", "at_least_one_source", "confidence_present"]
+  },
+  {
+    "id": "eval_002",
+    "draft": "Teams with written design docs reduce rework.",
+    "requiredSignals": ["numeric_endnotes", "at_least_one_source", "confidence_present"]
+  },
+  {
+    "id": "eval_003",
+    "draft": "Customer onboarding dropoff is highest in the first session.",
+    "requiredSignals": ["numeric_endnotes", "at_least_one_source", "confidence_present"]
+  }
+]

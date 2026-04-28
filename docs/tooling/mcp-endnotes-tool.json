@@ -1,0 +1,31 @@
+{
+  "name": "generate_endnotes",
+  "description": "Generate validated endnotes for AI-generated text in one call.",
+  "inputSchema": {
+    "type": "object",
+    "required": ["draft"],
+    "properties": {
+      "draft": {
+        "type": "string",
+        "description": "Generated text that needs citations and endnotes."
+      },
+      "style": {
+        "type": "string",
+        "enum": ["numeric", "author-date"]
+      },
+      "outputFormat": {
+        "type": "string",
+        "enum": ["markdown", "html", "json"]
+      },
+      "locale": {
+        "type": "string"
+      },
+      "metadata": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,170 @@
+openapi: 3.1.0
+info:
+  title: Endnotes API
+  version: 1.0.0
+  description: One-call API to generate trustworthy endnotes for AI content.
+servers:
+  - url: https://api.endnotes.ai
+paths:
+  /v1/endnotes:generate:
+    post:
+      operationId: generateEndnotes
+      summary: Generate endnotes from draft content
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GenerateEndnotesRequest"
+      responses:
+        "200":
+          description: Endnotes generated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GenerateEndnotesResponse"
+        "4XX":
+          description: Client error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorPayload"
+        "5XX":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorPayload"
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    GenerateEndnotesRequest:
+      type: object
+      required: [draft]
+      properties:
+        draft:
+          type: string
+        style:
+          type: string
+          enum: [numeric, author-date]
+        outputFormat:
+          type: string
+          enum: [markdown, html, json]
+        locale:
+          type: string
+        metadata:
+          type: object
+          additionalProperties:
+            type: string
+    EndnotesCitation:
+      type: object
+      required: [citationId, claim, endnoteLabel, confidence, sourceId, sourceUrl, sourceTitle, stale]
+      properties:
+        citationId:
+          type: string
+        claim:
+          type: string
+        endnoteLabel:
+          type: string
+        confidence:
+          type: number
+        sourceId:
+          type: string
+        sourceUrl:
+          type: string
+        sourceTitle:
+          type: string
+        stale:
+          type: boolean
+        staleWarning:
+          type: object
+          required: [reason, checkedAt, recommendedAction]
+          properties:
+            reason:
+              type: string
+              enum: [source_unreachable, source_moved, source_outdated]
+            checkedAt:
+              type: string
+            recommendedAction:
+              type: string
+              enum: [refresh_source, replace_source, manual_review]
+    EndnotesSource:
+      type: object
+      required: [id, title, url]
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        url:
+          type: string
+        publisher:
+          type: string
+        publishedAt:
+          type: string
+        qualityTier:
+          type: string
+          enum: [high, medium, low]
+    GenerateEndnotesResponse:
+      type: object
+      required: [requestId, citations, sources, renderedText, generatedAt, reliability]
+      properties:
+        requestId:
+          type: string
+        citations:
+          type: array
+          items:
+            $ref: "#/components/schemas/EndnotesCitation"
+        sources:
+          type: array
+          items:
+            $ref: "#/components/schemas/EndnotesSource"
+        renderedText:
+          type: string
+        generatedAt:
+          type: string
+        reliability:
+          type: object
+          required:
+            [
+              averageConfidence,
+              citationsBelowThreshold,
+              staleCitationCount,
+              sourceQualityBreakdown
+            ]
+          properties:
+            averageConfidence:
+              type: number
+            citationsBelowThreshold:
+              type: integer
+            staleCitationCount:
+              type: integer
+            sourceQualityBreakdown:
+              type: object
+              required: [high, medium, low]
+              properties:
+                high:
+                  type: integer
+                medium:
+                  type: integer
+                low:
+                  type: integer
+    ErrorPayload:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message, retryable]
+          properties:
+            code:
+              type: string
+            message:
+              type: string
+            retryable:
+              type: boolean

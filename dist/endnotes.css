@@ -1,0 +1,589 @@
+/* Footnote list UI aligned with Matt Ström-Awn (mattstromawn.com) — see /css/main.css .footnotes, .sectionHeader, .footnote-ref. */
+
+.endnotes-root {
+  /* Default body copy for markers, preview, list, and footnotes when the host omits theme tokens */
+  --endnotes-text-body: rgba(114, 119, 122, 1);
+  --endnotes-font-family: var(
+    --font-sans,
+    "Inter",
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    "Noto Sans",
+    sans-serif
+  );
+  --endnotes-foreground: var(--foreground, var(--endnotes-text-body));
+  --endnotes-muted: var(--muted-foreground, var(--endnotes-text-body));
+  --endnotes-background: var(--background, transparent);
+  --endnotes-surface: var(--background, transparent);
+  --endnotes-border: var(--border, color-mix(in srgb, currentColor 14%, transparent));
+  --endnotes-accent: var(--primary, currentColor);
+  --endnotes-radius: var(--radius, 0.625rem);
+  /* Matt light theme fallbacks when host does not set --c--theme-* */
+  --endnotes-matt-secondary: var(--c--theme-text-secondary, var(--endnotes-text-body));
+  --endnotes-matt-link: var(--c--theme-text-link, #5763ff);
+  --endnotes-matt-heading: var(--c--gray-900, #242627);
+  --endnotes-matt-rule: var(--c--gray-50, #ededed);
+  --endnotes-matt-target-bg: var(--c--yellow-25, #fbf8ce);
+  --endnotes-matt-radius-s: var(--l--border-radius-s, 0.25rem);
+  --endnotes-space-l: var(--l--space-l, 5rem);
+  --endnotes-space-m: var(--l--space-m, 2.25rem);
+  --endnotes-space-xs: var(--l--space-xs, 0.5rem);
+  --endnotes-type-s: var(--t--size-s, clamp(0.85rem, 2vw, 0.9rem));
+  --endnotes-leading-tight: var(--t--leading-tight, clamp(1.2em, calc(26px - 1vw), 1.3em));
+  --endnotes-weight-medium: var(--t--weight-medium, 500);
+  --endnotes-family-sans: var(--t--family-sans, var(--endnotes-font-family));
+  /* rem avoids compounding with <sup> UA font-size: smaller */
+  --endnotes-marker-size: var(--t--size-footnote-marker, 0.8125rem);
+  --endnotes-marker-offset: 0.05em;
+  --endnotes-marker-hover: color-mix(in oklab, currentColor 12%, transparent);
+  --endnotes-marker-highlight: color-mix(in oklab, currentColor 10%, transparent);
+  --endnotes-shadow: 0 8px 24px rgba(15, 23, 42, 0.1);
+  --endnotes-focus: color-mix(in oklab, currentColor 55%, transparent);
+  --endnotes-motion-duration: 0.22s;
+  --endnotes-motion-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --endnotes-preview-duration: 0.26s;
+  --endnotes-preview-ease: cubic-bezier(0.22, 1.28, 0.36, 1);
+  --endnotes-preview-font-size: 0.8125rem;
+  /* Do not set --endnotes-citation or --endnotes-link here so host (.demo-root, etc.) can override. */
+  --endnotes-heading-color: var(--endnotes-matt-heading);
+
+  color: var(--endnotes-foreground);
+  font-family: var(--endnotes-font-family);
+}
+
+.endnotes-root--adapt {
+  --endnotes-font-family: var(
+    --font-sans,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    "Helvetica Neue",
+    Arial,
+    "Noto Sans",
+    sans-serif
+  );
+  --endnotes-foreground: var(--foreground, var(--endnotes-text-body));
+  --endnotes-muted: var(--muted-foreground, var(--endnotes-text-body));
+  --endnotes-background: var(--background, transparent);
+  --endnotes-surface: var(--background, transparent);
+  --endnotes-border: var(--border, color-mix(in srgb, currentColor 14%, transparent));
+  --endnotes-accent: var(--primary, currentColor);
+  --endnotes-radius: var(--radius, 0.625rem);
+}
+
+.endnotes-root--implicit {
+  display: inline;
+}
+
+/* --- In-body reference (Matt: sup + .footnote-ref a) ---
+   Preview card is a sibling of <sup> (see .endnotes-marker-wrap) so it never inherits
+   UA superscript sizing or accidental OpenType features from the marker stack. */
+
+.endnotes-marker-wrap {
+  position: relative;
+  display: inline;
+}
+
+.endnotes-marker {
+  display: inline-block;
+  margin-inline-start: var(--endnotes-marker-offset);
+  vertical-align: super;
+  line-height: 0;
+}
+
+.endnotes-marker-link {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--endnotes-family-sans);
+  font-weight: var(--endnotes-weight-medium);
+  margin: 0 0.05em;
+  text-decoration: none;
+  color: inherit;
+  /* rem-based so size does not compound with <sup> shrink; avoid OpenType "sups" (breaks preview) */
+  font-size: var(--endnotes-marker-size, 0.8125rem);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: normal;
+  font-variant-position: normal;
+  vertical-align: baseline;
+  cursor: pointer;
+  border: 0;
+  background: transparent;
+  min-width: 1.2rem;
+  min-height: 1.2rem;
+  padding: 0.08em 0.22em;
+  border-radius: 999px;
+  transform: scale(1);
+  transition:
+    color var(--endnotes-motion-duration) var(--endnotes-motion-ease),
+    background-color var(--endnotes-motion-duration) var(--endnotes-motion-ease),
+    box-shadow var(--endnotes-motion-duration) var(--endnotes-motion-ease),
+    transform var(--endnotes-motion-duration) var(--endnotes-motion-ease);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .endnotes-marker-link:hover {
+    color: inherit;
+    background-color: var(--endnotes-marker-hover);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .endnotes-marker-link:hover {
+    transform: scale(1.05);
+  }
+}
+
+.endnotes-marker-link.is-active {
+  color: inherit;
+  background-color: var(--endnotes-marker-highlight);
+}
+
+.endnotes-marker-link--pending {
+  cursor: default;
+  opacity: 0.55;
+  pointer-events: none;
+  border-radius: 999px;
+  min-width: 1.2rem;
+  min-height: 1.2rem;
+  padding: 0.08em 0.22em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.endnotes-marker-link:focus-visible {
+  outline: none;
+  color: inherit;
+  background-color: var(--endnotes-marker-hover);
+  box-shadow: 0 0 0 2px var(--endnotes-background), 0 0 0 4px var(--endnotes-focus);
+}
+
+.endnotes-backref:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--endnotes-background), 0 0 0 4px var(--endnotes-focus);
+}
+
+/* --- Footnotes block (Matt: .footnotes) --- */
+
+.endnotes-section {
+  color: var(--endnotes-citation, var(--endnotes-matt-secondary, var(--endnotes-text-body)));
+  margin-top: var(--endnotes-space-l);
+  border-top: 0;
+  padding-top: 0;
+}
+
+.endnotes-sectionHeader {
+  display: flex;
+  gap: var(--endnotes-space-xs);
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.endnotes-sectionHeader-name {
+  flex: 0 1 auto;
+  margin: 0;
+  padding: 0;
+  font-family: var(--endnotes-family-sans);
+  font-size: 18px;
+  line-height: 0.75;
+  color: var(--endnotes-heading-color, var(--endnotes-matt-heading));
+  font-weight: 600;
+}
+
+.endnotes-sectionHeader-divider {
+  flex: 1 1 auto;
+  margin: 0;
+  border: 0;
+  border-bottom: 1px solid var(--endnotes-matt-rule);
+}
+
+.endnotes-list {
+  list-style: decimal;
+  list-style-position: outside;
+  margin: var(--endnotes-space-m) 0 0;
+  padding-left: 1rem;
+  font-family: var(--endnotes-family-sans);
+  font-size: var(--endnotes-type-s);
+  line-height: var(--endnotes-leading-tight);
+  color: var(--endnotes-citation, var(--endnotes-matt-secondary, var(--endnotes-text-body)));
+}
+
+.endnotes-item {
+  padding-left: var(--endnotes-space-xs);
+  scroll-margin-top: 1rem;
+  color: inherit;
+}
+
+.endnotes-item + .endnotes-item {
+  margin-top: var(--endnotes-space-xs);
+}
+
+.endnotes-item:target,
+.endnotes-item.is-active {
+  background-color: var(--endnotes-matt-target-bg);
+  border-radius: var(--endnotes-matt-radius-s);
+}
+
+.endnotes-item:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--endnotes-background), 0 0 0 4px var(--endnotes-focus);
+}
+
+.endnotes-footnote-p {
+  margin: 0;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: var(--endnotes-text-body);
+}
+
+.endnotes-section a {
+  hyphens: auto;
+  overflow-wrap: anywhere;
+  word-break: break-all;
+}
+
+.endnotes-title {
+  font-weight: var(--endnotes-weight-medium);
+  line-height: inherit;
+  letter-spacing: -0.01em;
+  font-size: inherit;
+  color: inherit;
+}
+
+.endnotes-title-link {
+  color: var(--endnotes-text-body);
+  text-decoration: none;
+  transition: color var(--endnotes-motion-duration) var(--endnotes-motion-ease);
+}
+
+.endnotes-title-link:visited {
+  color: var(--endnotes-text-body);
+}
+
+.endnotes-title-link:hover,
+.endnotes-title-link:focus-visible {
+  color: var(--endnotes-text-body);
+  text-decoration: underline;
+}
+
+.endnotes-sentence {
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+}
+
+.endnotes-section .endnotes-links {
+  display: inline;
+  margin-left: 0.1rem;
+  white-space: normal;
+}
+
+.endnotes-backref {
+  color: var(--endnotes-text-body);
+  margin: 0 0.1rem;
+  text-decoration: none;
+  font: inherit;
+  cursor: pointer;
+  transition: color var(--endnotes-motion-duration) var(--endnotes-motion-ease);
+}
+
+.endnotes-backref:hover,
+.endnotes-backref:focus-visible {
+  color: var(--endnotes-text-body);
+  text-decoration: underline;
+}
+
+.endnotes-backlink-prefix {
+  color: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  text-decoration: none;
+  margin-right: 0.02rem;
+}
+
+.endnotes-backlink--index {
+  min-width: 1.1rem;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .endnotes-title-link,
+  .endnotes-title-link:visited,
+  .endnotes-backref {
+    transition: none;
+  }
+
+  .endnotes-marker-link,
+  .endnotes-marker-link:hover {
+    transition: none;
+    transform: none;
+  }
+}
+
+@keyframes endnotes-preview-pop {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(8px) scale(0.92);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+.endnotes-preview-card {
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 0.5rem);
+  z-index: 20;
+  width: min(20rem, calc(100vw - 2rem));
+  padding: 0.55rem 0.68rem;
+  border: 1px solid var(--endnotes-border);
+  border-radius: calc(var(--endnotes-radius) - 2px);
+  background: var(--endnotes-background);
+  box-shadow: var(--endnotes-shadow);
+  color: var(--endnotes-foreground);
+  display: grid;
+  gap: 0.16rem;
+  line-height: 1.35;
+  /* Isolate from <sup> UA shrink + any ancestor font features */
+  font-family: var(--endnotes-font-family);
+  font-size: var(--endnotes-preview-font-size, 0.8125rem);
+  font-weight: 400;
+  font-feature-settings: normal;
+  font-variant-position: normal;
+  font-variant-numeric: normal;
+  font-synthesis: weight style;
+  white-space: normal;
+  transform-origin: center top;
+  transform: translateX(-50%) translateY(0) scale(1);
+  opacity: 1;
+  animation: endnotes-preview-pop var(--endnotes-preview-duration) var(--endnotes-preview-ease) both;
+}
+
+.endnotes-preview-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 0.625rem;
+}
+
+.endnotes-preview-title {
+  font-weight: 600;
+  font-size: 1em;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.endnotes-preview-meta,
+.endnotes-preview-href {
+  color: var(--endnotes-muted);
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+a.endnotes-preview-href {
+  text-decoration: none;
+  font-variant-numeric: normal;
+  font-feature-settings: normal;
+}
+
+a.endnotes-preview-href:hover {
+  color: var(--endnotes-text-body);
+  text-decoration: underline;
+}
+
+.endnotes-preview-quote {
+  color: color-mix(in oklab, var(--endnotes-muted) 70%, var(--endnotes-foreground) 30%);
+  font-style: italic;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .endnotes-preview-card {
+    animation: none;
+  }
+}
+
+/* --- Toaster --- */
+
+.endnotes-toaster {
+  --endnotes-toast-offset: 16px;
+  --endnotes-toast-gap: 10px;
+  position: fixed;
+  z-index: 2147483647;
+  pointer-events: none;
+  inset: auto;
+}
+
+.endnotes-toast-list {
+  display: grid;
+  gap: var(--endnotes-toast-gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.endnotes-toast {
+  pointer-events: auto;
+  width: min(22rem, calc(100vw - var(--endnotes-toast-offset) * 2));
+  border-radius: calc(var(--endnotes-radius, 0.625rem) + 2px);
+  border: 1px solid color-mix(in srgb, var(--endnotes-border) 80%, transparent);
+  background: color-mix(in srgb, var(--endnotes-background, #fff) 96%, #000 4%);
+  color: var(--endnotes-foreground, #111);
+  box-shadow: 0 14px 36px rgba(2, 6, 23, 0.18);
+  padding: 12px 12px 12px 14px;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 10px;
+  align-items: start;
+  transform: translateY(0);
+  opacity: 1;
+  transition:
+    transform 180ms var(--endnotes-motion-ease),
+    opacity 180ms var(--endnotes-motion-ease);
+}
+
+.endnotes-toast.is-hidden {
+  opacity: 0;
+  transform: translateY(8px) scale(0.98);
+}
+
+.endnotes-toast-content {
+  display: grid;
+  gap: 4px;
+}
+
+.endnotes-toast-title {
+  font-weight: 600;
+  font-size: 0.92rem;
+  line-height: 1.3;
+}
+
+.endnotes-toast-description {
+  font-size: 0.84rem;
+  line-height: 1.35;
+  color: color-mix(in oklab, var(--endnotes-foreground) 76%, var(--endnotes-muted) 24%);
+}
+
+.endnotes-toast-actions {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.endnotes-toast-button,
+.endnotes-toast-close {
+  border: 0;
+  background: color-mix(in srgb, var(--endnotes-foreground) 10%, transparent);
+  color: inherit;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.76rem;
+  line-height: 1;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.endnotes-toast-button {
+  padding: 7px 9px;
+}
+
+.endnotes-toast-button--cancel {
+  background: transparent;
+  color: var(--endnotes-muted);
+}
+
+.endnotes-toast-close {
+  width: 26px;
+  height: 26px;
+  font-size: 1rem;
+}
+
+.endnotes-toast-button:focus-visible,
+.endnotes-toast-close:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--endnotes-background), 0 0 0 4px var(--endnotes-focus);
+}
+
+.endnotes-toaster--top-left {
+  top: var(--endnotes-toast-offset);
+  left: var(--endnotes-toast-offset);
+}
+
+.endnotes-toaster--top-right {
+  top: var(--endnotes-toast-offset);
+  right: var(--endnotes-toast-offset);
+}
+
+.endnotes-toaster--top-center {
+  top: var(--endnotes-toast-offset);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.endnotes-toaster--bottom-left {
+  bottom: var(--endnotes-toast-offset);
+  left: var(--endnotes-toast-offset);
+}
+
+.endnotes-toaster--bottom-right {
+  bottom: var(--endnotes-toast-offset);
+  right: var(--endnotes-toast-offset);
+}
+
+.endnotes-toaster--bottom-center {
+  bottom: var(--endnotes-toast-offset);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.endnotes-toaster--rich .endnotes-toast--success {
+  background: linear-gradient(180deg, color-mix(in srgb, #18a16f 24%, var(--endnotes-background) 76%), var(--endnotes-background));
+}
+
+.endnotes-toaster--rich .endnotes-toast--error {
+  background: linear-gradient(180deg, color-mix(in srgb, #d84f58 20%, var(--endnotes-background) 80%), var(--endnotes-background));
+}
+
+.endnotes-toaster--rich .endnotes-toast--warning {
+  background: linear-gradient(180deg, color-mix(in srgb, #e4a91a 20%, var(--endnotes-background) 80%), var(--endnotes-background));
+}
+
+.endnotes-toaster--rich .endnotes-toast--info,
+.endnotes-toaster--rich .endnotes-toast--loading {
+  background: linear-gradient(180deg, color-mix(in srgb, #3f73ff 18%, var(--endnotes-background) 82%), var(--endnotes-background));
+}
+
+@media (max-width: 640px) {
+  .endnotes-toaster {
+    left: var(--endnotes-toast-offset);
+    right: var(--endnotes-toast-offset);
+    top: auto;
+    bottom: var(--endnotes-toast-offset);
+    transform: none;
+  }
+
+  .endnotes-toast {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .endnotes-toast {
+    transition: none;
+  }
+}

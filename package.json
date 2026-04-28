@@ -1,0 +1,55 @@
+{
+  "name": "endnotes",
+  "version": "0.1.0",
+  "description": "Default footnoting API and React UI primitives for AI-generated content.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./style.css": "./dist/endnotes.css",
+    "./styles.css": "./dist/endnotes.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --sourcemap --clean && cp src/styles/endnotes.css dist/endnotes.css",
+    "demo": "vite --config examples/demo/vite.config.ts",
+    "dev": "vite --config examples/demo/vite.config.ts",
+    "build:demo": "vite build --config examples/demo/vite.config.ts",
+    "test": "vitest run",
+    "test:golden": "vitest run tests/golden-examples.test.ts",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "evals": "node evals/run-evals.mjs",
+    "verify:package": "node scripts/verify-package.mjs",
+    "smoke": "node scripts/smoke.mjs"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0 || ^19.0.0",
+    "react-dom": "^18.2.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.3.0",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react": "^4.7.0",
+    "jsdom": "^26.1.0",
+    "shiki": "^4.0.2",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.3",
+    "vite": "^5.4.19",
+    "vitest": "^3.1.2"
+  }
+}
