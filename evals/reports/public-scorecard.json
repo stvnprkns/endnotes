@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "2026-04-trust-mvp",
+  "generatedAt": "2026-04-28T22:59:47.046Z",
+  "apiBaseUrl": "http://localhost:8787/v1",
+  "notes": "Public reliability scorecard format for transparent benchmark publishing.",
+  "policy": {
+    "minAverageConfidence": 0.8,
+    "minCitationConfidence": 0.7,
+    "allowLowTierSources": false,
+    "maxStaleCitations": 0,
+    "maxCitationsBelowThreshold": 0
+  },
+  "thresholds": {
+    "minPassRate": 0.9,
+    "minPublishableRate": 0.25,
+    "maxManualReviewRate": 0.75,
+    "minTrustDecisionAccuracy": 1
+  },
+  "categories": {
+    "signalCompleteness": {
+      "citationAvailability": 1,
+      "confidenceCoverage": 1,
+      "sourceQualityCoverage": 1,
+      "staleSignalCoverage": 1
+    },
+    "trustOutcomes": {
+      "passRate": 1,
+      "publishableRate": 0.5714285714285714,
+      "manualReviewRate": 0.42857142857142855,
+      "trustDecisionAccuracy": 1
+    }
+  },
+  "totalCases": 7
+}

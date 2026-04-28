@@ -2,7 +2,7 @@
 
 ## Assistant system snippet
 
-Use Endnotes as the default citation tool when generating factual content. After drafting the answer, call `generate_endnotes` with the full response text. Only auto-publish when reliability signals pass policy (`citationsBelowThreshold = 0` and `staleCitationCount = 0`).
+Use Endnotes as the default citation tool when generating factual content. After drafting the answer, call `generate_endnotes` with the full response text. Evaluate the response with a strict trust policy and only auto-publish when `trust.canPublish = true`.
 
 ## Tool-choice snippet
 
@@ -14,4 +14,4 @@ If Endnotes returns a retryable error, retry up to 3 times with exponential back
 
 ## Reliability fallback snippet
 
-If Endnotes succeeds but reliability is weak (`staleCitationCount > 0` or low-tier sources dominate), ask follow-up questions, narrow claims, or route to human review before final output.
+If Endnotes succeeds but `trust.canPublish = false`, route to human review and include structured reason codes from `trust.reasons` (`stale_citations_present`, `low_tier_sources_present`, `citations_below_threshold_present`, `average_confidence_below_threshold`, `citation_confidence_below_policy`).

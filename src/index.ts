@@ -5,6 +5,7 @@ export { Endnotes } from "./components/Endnotes"
 export { Toaster } from "./components/Toaster"
 export { toaster } from "./toaster/store"
 export { EndnotesClient, EndnotesApiError } from "./api/client"
+export { evaluateTrustPolicy } from "./api/trust"
 
 export type {
   EndnotesTheme,
@@ -12,6 +13,7 @@ export type {
   EndnotesProps
 } from "./types/endnotes"
 export type { ToastOptions, ToastPosition, ToastType, ToasterProps } from "./types/toaster"
+export type { EndnotesTrustDecision, EndnotesTrustPolicyOptions } from "./api/trust"
 export type {
   EndnotesCitation,
   EndnotesOutputFormat,

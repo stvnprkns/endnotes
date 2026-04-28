@@ -13,7 +13,7 @@ Endnotes turns generated claims into validated, formatted endnotes with source m
 ## API-first quick start
 
 ```ts
-import { EndnotesClient } from "endnotes"
+import { EndnotesClient, evaluateTrustPolicy } from "endnotes"
 
 const client = new EndnotesClient({
   apiKey: process.env.ENDNOTES_API_KEY!
@@ -24,6 +24,11 @@ const result = await client.generate({
   style: "numeric",
   outputFormat: "markdown"
 })
+
+const trust = evaluateTrustPolicy(result)
+if (!trust.canPublish) {
+  console.warn("Needs review", trust.reasons)
+}
 
 console.log(result.renderedText)
 ```
@@ -193,6 +198,12 @@ npm run smoke
 
 See [`docs/API.md`](docs/API.md) for the full API reference.
 
+For local dogfooding while building Endnotes itself, run evals against a local API base URL:
+
+```bash
+ENDNOTES_API_BASE_URL=http://localhost:8787/v1 npm run evals
+```
+
 ## AI adoption assets
 
 - Quickstart for agent builders: [`docs/AI_QUICKSTART.md`](docs/AI_QUICKSTART.md)
@@ -203,7 +214,12 @@ See [`docs/API.md`](docs/API.md) for the full API reference.
 - Golden examples verification: [`tests/golden-examples.test.ts`](tests/golden-examples.test.ts)
 - CI workflow with golden checks: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)
 - Quality scorecards: [`docs/EVALS.md`](docs/EVALS.md)
+- Comparison scorecards: `evals/reports/public-comparison-scorecard.json`
 - Adoption instrumentation: [`docs/METRICS.md`](docs/METRICS.md)
+- Weekly reliability changelog workflow: [`docs/PHASE3.md`](docs/PHASE3.md)
+- Weekly reliability updates: [`docs/reliability-changelog.md`](docs/reliability-changelog.md)
+- Builder setup and local trust workflow: [`docs/BUILDER_ONBOARDING.md`](docs/BUILDER_ONBOARDING.md)
+- Dev API key management: [`docs/API_KEYS.md`](docs/API_KEYS.md)
 
 ## Phase 2 shipped
 

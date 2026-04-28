@@ -1,0 +1,354 @@
+{
+  "schemaVersion": "2026-04-trust-comparison-v1",
+  "generatedAt": "2026-04-28T23:14:34.145Z",
+  "notes": "Synthetic trust-case comparison across named alternatives. Alternative providers are simulated profiles, not live external API measurements.",
+  "policy": {
+    "minAverageConfidence": 0.8,
+    "minCitationConfidence": 0.7,
+    "allowLowTierSources": false,
+    "maxStaleCitations": 0,
+    "maxCitationsBelowThreshold": 0
+  },
+  "providers": [
+    {
+      "providerId": "endnotes",
+      "providerLabel": "Endnotes",
+      "totalCases": 4,
+      "categories": {
+        "signalCompleteness": {
+          "citationAvailability": 1,
+          "confidenceCoverage": 1,
+          "sourceQualityCoverage": 1,
+          "staleSignalCoverage": 1
+        },
+        "trustOutcomes": {
+          "passRate": 1,
+          "publishableRate": 0.25,
+          "manualReviewRate": 0.75,
+          "trustDecisionAccuracy": 1
+        }
+      },
+      "passRate": 1,
+      "results": [
+        {
+          "id": "trust_publishable",
+          "passed": true,
+          "passedSignals": {
+            "hasCitation": true,
+            "hasConfidence": true,
+            "hasQualityTier": true,
+            "hasReliabilitySummary": true,
+            "hasStaleSignal": true,
+            "hasStaleWarning": true
+          },
+          "trustDecision": {
+            "canPublish": true,
+            "needsReview": false,
+            "reasons": []
+          },
+          "decisionMatchesExpectation": true
+        },
+        {
+          "id": "trust_stale_review",
+          "passed": true,
+          "passedSignals": {
+            "hasCitation": true,
+            "hasConfidence": true,
+            "hasQualityTier": true,
+            "hasReliabilitySummary": true,
+            "hasStaleSignal": true,
+            "hasStaleWarning": true
+          },
+          "trustDecision": {
+            "canPublish": false,
+            "needsReview": true,
+            "reasons": [
+              "stale_citations_present"
+            ]
+          },
+          "decisionMatchesExpectation": true
+        },
+        {
+          "id": "trust_low_tier_review",
+          "passed": true,
+          "passedSignals": {
+            "hasCitation": true,
+            "hasConfidence": true,
+            "hasQualityTier": true,
+            "hasReliabilitySummary": true,
+            "hasStaleSignal": true,
+            "hasStaleWarning": true
+          },
+          "trustDecision": {
+            "canPublish": false,
+            "needsReview": true,
+            "reasons": [
+              "low_tier_sources_present"
+            ]
+          },
+          "decisionMatchesExpectation": true
+        },
+        {
+          "id": "trust_low_confidence_review",
+          "passed": true,
+          "passedSignals": {
+            "hasCitation": true,
+            "hasConfidence": true,
+            "hasQualityTier": true,
+            "hasReliabilitySummary": true,
+            "hasStaleSignal": true,
+            "hasStaleWarning": true
+          },
+          "trustDecision": {
+            "canPublish": false,
+            "needsReview": true,
+            "reasons": [
+              "average_confidence_below_threshold",
+              "citations_below_threshold_present",
+              "citation_confidence_below_policy"
+            ]
+          },
+          "decisionMatchesExpectation": true
+        }
+      ]
+    },
+    {
+      "providerId": "generic_rag_citations",
+      "providerLabel": "Generic RAG citations",
+      "totalCases": 4,
+      "categories": {
+        "signalCompleteness": {
+          "citationAvailability": 1,
+          "confidenceCoverage": 1,
+          "sourceQualityCoverage": 1,
+          "staleSignalCoverage": 0.75
+        },
+        "trustOutcomes": {
+          "passRate": 0.5,
+          "publishableRate": 0.5,
+          "manualReviewRate": 0.5,
+          "trustDecisionAccuracy": 0.75
+        }
+      },
+      "passRate": 0.5,
+      "results": [
+        {
+          "id": "trust_publishable",
+          "passed": true,
+          "passedSignals": {
+            "hasCitation": true,
+            "hasConfidence": true,
+            "hasQualityTier": true,
+            "hasReliabilitySummary": true,
+            "hasStaleSignal": true,
+            "hasStaleWarning": true
+          },
+          "trustDecision": {
+            "canPublish": true,
+            "needsReview": false,
+            "reasons": []
+          },
+          "decisionMatchesExpectation": true
+        },
+        {
+          "id": "trust_stale_review",
+          "passed": false,
+          "passedSignals": {
+            "hasCitation": true,
+            "hasConfidence": true,
+            "hasQualityTier": true,
+            "hasReliabilitySummary": true,
+            "hasStaleSignal": true,
+            "hasStaleWarning": false
+          },
+          "trustDecision": {
+            "canPublish": false,
+            "needsReview": true,
+            "reasons": [
+              "stale_citations_present"
+            ]
+          },
+          "decisionMatchesExpectation": true
+        },
+        {
+          "id": "trust_low_tier_review",
+          "passed": false,
+          "passedSignals": {
+            "hasCitation": true,
+            "hasConfidence": true,
+            "hasQualityTier": true,
+            "hasReliabilitySummary": true,
+            "hasStaleSignal": true,
+            "hasStaleWarning": true
+          },
+          "trustDecision": {
+            "canPublish": true,
+            "needsReview": false,
+            "reasons": []
+          },
+          "decisionMatchesExpectation": false
+        },
+        {
+          "id": "trust_low_confidence_review",
+          "passed": true,
+          "passedSignals": {
+            "hasCitation": true,
+            "hasConfidence": true,
+            "hasQualityTier": true,
+            "hasReliabilitySummary": true,
+            "hasStaleSignal": true,
+            "hasStaleWarning": true
+          },
+          "trustDecision": {
+            "canPublish": false,
+            "needsReview": true,
+            "reasons": [
+              "average_confidence_below_threshold",
+              "citations_below_threshold_present",
+              "citation_confidence_below_policy"
+            ]
+          },
+          "decisionMatchesExpectation": true
+        }
+      ]
+    },
+    {
+      "providerId": "manual_footnotes",
+      "providerLabel": "Manual footnotes pipeline",
+      "totalCases": 4,
+      "categories": {
+        "signalCompleteness": {
+          "citationAvailability": 1,
+          "confidenceCoverage": 1,
+          "sourceQualityCoverage": 1,
+          "staleSignalCoverage": 1
+        },
+        "trustOutcomes": {
+          "passRate": 0.75,
+          "publishableRate": 0,
+          "manualReviewRate": 1,
+          "trustDecisionAccuracy": 0.75
+        }
+      },
+      "passRate": 0.75,
+      "results": [
+        {
+          "id": "trust_publishable",
+          "passed": false,
+          "passedSignals": {
+            "hasCitation": true,
+            "hasConfidence": true,
+            "hasQualityTier": true,
+            "hasReliabilitySummary": true,
+            "hasStaleSignal": true,
+            "hasStaleWarning": true
+          },
+          "trustDecision": {
+            "canPublish": false,
+            "needsReview": true,
+            "reasons": [
+              "average_confidence_below_threshold",
+              "citations_below_threshold_present",
+              "stale_citations_present",
+              "low_tier_sources_present"
+            ]
+          },
+          "decisionMatchesExpectation": false
+        },
+        {
+          "id": "trust_stale_review",
+          "passed": true,
+          "passedSignals": {
+            "hasCitation": true,
+            "hasConfidence": true,
+            "hasQualityTier": true,
+            "hasReliabilitySummary": true,
+            "hasStaleSignal": true,
+            "hasStaleWarning": true
+          },
+          "trustDecision": {
+            "canPublish": false,
+            "needsReview": true,
+            "reasons": [
+              "average_confidence_below_threshold",
+              "citations_below_threshold_present",
+              "stale_citations_present",
+              "low_tier_sources_present"
+            ]
+          },
+          "decisionMatchesExpectation": true
+        },
+        {
+          "id": "trust_low_tier_review",
+          "passed": true,
+          "passedSignals": {
+            "hasCitation": true,
+            "hasConfidence": true,
+            "hasQualityTier": true,
+            "hasReliabilitySummary": true,
+            "hasStaleSignal": true,
+            "hasStaleWarning": true
+          },
+          "trustDecision": {
+            "canPublish": false,
+            "needsReview": true,
+            "reasons": [
+              "average_confidence_below_threshold",
+              "citations_below_threshold_present",
+              "stale_citations_present",
+              "low_tier_sources_present"
+            ]
+          },
+          "decisionMatchesExpectation": true
+        },
+        {
+          "id": "trust_low_confidence_review",
+          "passed": true,
+          "passedSignals": {
+            "hasCitation": true,
+            "hasConfidence": true,
+            "hasQualityTier": true,
+            "hasReliabilitySummary": true,
+            "hasStaleSignal": true,
+            "hasStaleWarning": true
+          },
+          "trustDecision": {
+            "canPublish": false,
+            "needsReview": true,
+            "reasons": [
+              "average_confidence_below_threshold",
+              "citations_below_threshold_present",
+              "stale_citations_present",
+              "low_tier_sources_present",
+              "citation_confidence_below_policy"
+            ]
+          },
+          "decisionMatchesExpectation": true
+        }
+      ]
+    }
+  ],
+  "ranking": [
+    {
+      "providerId": "endnotes",
+      "providerLabel": "Endnotes",
+      "passRate": 1,
+      "publishableRate": 0.25,
+      "trustDecisionAccuracy": 1
+    },
+    {
+      "providerId": "manual_footnotes",
+      "providerLabel": "Manual footnotes pipeline",
+      "passRate": 0.75,
+      "publishableRate": 0,
+      "trustDecisionAccuracy": 0.75
+    },
+    {
+      "providerId": "generic_rag_citations",
+      "providerLabel": "Generic RAG citations",
+      "passRate": 0.5,
+      "publishableRate": 0.5,
+      "trustDecisionAccuracy": 0.75
+    }
+  ]
+}

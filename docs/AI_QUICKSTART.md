@@ -13,7 +13,7 @@ Set `ENDNOTES_API_KEY` in your runtime environment.
 ## 2) One-call integration
 
 ```ts
-import { EndnotesClient } from "endnotes"
+import { EndnotesClient, evaluateTrustPolicy } from "endnotes"
 
 const client = new EndnotesClient({ apiKey: process.env.ENDNOTES_API_KEY! })
 
@@ -30,8 +30,11 @@ Use reliability gates before publishing output:
 
 ```ts
 const result = await addEndnotes(answerDraft)
-if (result.reliability.citationsBelowThreshold > 0 || result.reliability.staleCitationCount > 0) {
+const trust = evaluateTrustPolicy(result)
+
+if (!trust.canPublish) {
   // Route to fallback or human review for trust-sensitive flows.
+  // trust.reasons includes normalized reason codes.
 }
 ```
 
@@ -73,6 +76,20 @@ const replay = client.buildReplayRequest({
 
 ## Reliability policy snippet (Phase 3)
 
-- If `reliability.citationsBelowThreshold > 0`, regenerate or ask for narrower claims.
-- If `reliability.staleCitationCount > 0`, refresh those sources before final publish.
-- If any source has `qualityTier: low`, display a trust warning badge in UI.
+Canonical publish gate:
+
+```ts
+const trust = evaluateTrustPolicy(result, {
+  minAverageConfidence: 0.8,
+  minCitationConfidence: 0.7,
+  allowLowTierSources: false,
+  maxStaleCitations: 0,
+  maxCitationsBelowThreshold: 0
+})
+
+if (trust.canPublish) {
+  // safe to auto-publish
+} else {
+  // require review: trust.reasons + trust.summary
+}
+```

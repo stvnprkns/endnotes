@@ -1,4 +1,4 @@
-import { EndnotesClient } from "../../src"
+import { EndnotesClient, evaluateTrustPolicy } from "../../src"
 
 const client = new EndnotesClient({
   apiKey: process.env.ENDNOTES_API_KEY!,
@@ -13,5 +13,17 @@ export async function POST(req: Request): Promise<Response> {
     outputFormat: "markdown"
   })
 
-  return Response.json(result)
+  const trust = evaluateTrustPolicy(result)
+  if (!trust.canPublish) {
+    return Response.json(
+      {
+        status: "needs_review",
+        trust,
+        result
+      },
+      { status: 202 }
+    )
+  }
+
+  return Response.json({ status: "publishable", trust, result })
 }

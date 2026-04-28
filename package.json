@@ -32,6 +32,13 @@
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "evals": "node evals/run-evals.mjs",
+    "evals:compare": "node evals/run-comparisons.mjs",
+    "evals:local": "ENDNOTES_API_BASE_URL=http://localhost:8787/v1 node evals/run-evals.mjs",
+    "api:dev": "node scripts/dev-api-server.mjs",
+    "reliability:changelog": "node scripts/generate-reliability-changelog.mjs",
+    "reliability:weekly": "npm run evals && npm run reliability:changelog",
+    "verify:dev-keys": "node scripts/verify-dev-api-keys.mjs",
+    "report:dev-usage": "node scripts/report-dev-api-usage.mjs",
     "verify:package": "node scripts/verify-package.mjs",
     "smoke": "node scripts/smoke.mjs"
   },

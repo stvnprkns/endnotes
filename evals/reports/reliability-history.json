@@ -1,0 +1,29 @@
+[
+  {
+    "generatedAt": "2026-04-28T22:39:17.927Z",
+    "schemaVersion": "2026-04-trust-mvp",
+    "totalCases": 4,
+    "passRate": 1,
+    "publishableRate": 0.25,
+    "manualReviewRate": 0.75,
+    "trustDecisionAccuracy": 1
+  },
+  {
+    "generatedAt": "2026-04-28T22:44:27.248Z",
+    "schemaVersion": "2026-04-trust-mvp",
+    "totalCases": 4,
+    "passRate": 1,
+    "publishableRate": 0.25,
+    "manualReviewRate": 0.75,
+    "trustDecisionAccuracy": 1
+  },
+  {
+    "generatedAt": "2026-04-28T22:44:39.784Z",
+    "schemaVersion": "2026-04-trust-mvp",
+    "totalCases": 7,
+    "passRate": 1,
+    "publishableRate": 0.5714285714285714,
+    "manualReviewRate": 0.42857142857142855,
+    "trustDecisionAccuracy": 1
+  }
+]

@@ -24,10 +24,27 @@ describe("golden examples", () => {
       status: 200,
       json: async () => ({
         requestId: "req_golden",
-        citations: [],
-        sources: [],
+        citations: [
+          {
+            citationId: "cit_1",
+            claim: "Answer draft",
+            endnoteLabel: "1",
+            confidence: 0.9,
+            sourceId: "src_1",
+            sourceUrl: "https://example.com/source",
+            sourceTitle: "Source",
+            stale: false
+          }
+        ],
+        sources: [{ id: "src_1", title: "Source", url: "https://example.com/source", qualityTier: "high" }],
         renderedText: "Answer",
-        generatedAt: "2026-04-28T00:00:00.000Z"
+        generatedAt: "2026-04-28T00:00:00.000Z",
+        reliability: {
+          averageConfidence: 0.9,
+          citationsBelowThreshold: 0,
+          staleCitationCount: 0,
+          sourceQualityBreakdown: { high: 1, medium: 0, low: 0 }
+        }
       })
     })
     vi.stubGlobal("fetch", mockFetch)
@@ -37,9 +54,10 @@ describe("golden examples", () => {
       body: JSON.stringify({ draft: "Answer draft" })
     })
     const response = await POST(request)
-    const json = (await response.json()) as { requestId: string }
+    const json = (await response.json()) as { status: string; result: { requestId: string } }
 
     expect(response.status).toBe(200)
-    expect(json.requestId).toBe("req_golden")
+    expect(json.status).toBe("publishable")
+    expect(json.result.requestId).toBe("req_golden")
   })
 })

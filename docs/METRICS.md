@@ -21,6 +21,22 @@ const client = new EndnotesClient({
 
 These metrics map directly to activation and reliability funnel analysis.
 
+## Dev API usage report
+
+For local builder telemetry, the dev API server appends request events to `.local/dev-api-usage.log`.
+
+Generate a quick usage summary:
+
+```bash
+npm run report:dev-usage
+```
+
+The output includes:
+
+- total request count
+- authenticated vs unauthenticated request split
+- top API key IDs by request volume
+
 ## Request traces
 
 Use `onTrace` to capture request lifecycle events:

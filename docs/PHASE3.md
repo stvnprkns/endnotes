@@ -13,6 +13,11 @@ Phase 3 goal: build trust moat and distribution flywheel.
   - `evals/reports/public-scorecard.json`
 - Reliability policy snippets added for agent builders:
   - [`docs/AI_QUICKSTART.md`](docs/AI_QUICKSTART.md)
+- Canonical trust decision helper shipped:
+  - `evaluateTrustPolicy` in TypeScript and Python SDK examples
+- Weekly reliability changelog pipeline added:
+  - `npm run reliability:weekly`
+  - [`docs/reliability-changelog.md`](docs/reliability-changelog.md)
 
 ## Why this matters
 
@@ -20,8 +25,32 @@ Phase 3 goal: build trust moat and distribution flywheel.
 - Reliability metadata is now machine-readable for agents and gateways.
 - Public scorecard format makes quality progress transparent over time.
 
+## Weekly trust workflow
+
+Run this command once per week:
+
+```bash
+npm run reliability:weekly
+```
+
+This will:
+
+1. Run API + synthetic trust eval cases.
+2. Regenerate `evals/reports/latest.json` and `evals/reports/public-scorecard.json`.
+3. Append a dated entry to [`docs/reliability-changelog.md`](docs/reliability-changelog.md).
+
 ## Next Phase 3 steps
 
-- Publish weekly reliability changelog entries.
-- Add comparison runners for named alternatives in the scorecard.
 - Ship onboarding/free-tier docs and activation funnel instrumentation updates.
+- Expand local/CI trust operations with API key lifecycle verification and usage summaries.
+
+## Comparison runners (shipped)
+
+Named alternative comparison runners now generate a public comparison scorecard:
+
+- command: `npm run evals:compare`
+- output: `evals/reports/public-comparison-scorecard.json`
+- providers:
+  - `endnotes`
+  - `generic_rag_citations`
+  - `manual_footnotes`

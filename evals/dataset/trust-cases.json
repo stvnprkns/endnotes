@@ -1,0 +1,155 @@
+[
+  {
+    "id": "trust_publishable",
+    "mode": "synthetic",
+    "description": "High-confidence output with no stale or low-tier signals should be publishable.",
+    "expectedDecision": "publishable",
+    "payload": {
+      "requestId": "synthetic_publishable",
+      "citations": [
+        {
+          "citationId": "cit_1",
+          "claim": "Claim",
+          "endnoteLabel": "1",
+          "confidence": 0.93,
+          "sourceId": "src_1",
+          "sourceUrl": "https://example.com/high",
+          "sourceTitle": "Trusted Source",
+          "stale": false
+        }
+      ],
+      "sources": [
+        {
+          "id": "src_1",
+          "title": "Trusted Source",
+          "url": "https://example.com/high",
+          "qualityTier": "high"
+        }
+      ],
+      "renderedText": "Claim[^1]",
+      "generatedAt": "2026-04-28T00:00:00.000Z",
+      "reliability": {
+        "averageConfidence": 0.93,
+        "citationsBelowThreshold": 0,
+        "staleCitationCount": 0,
+        "sourceQualityBreakdown": { "high": 1, "medium": 0, "low": 0 }
+      }
+    }
+  },
+  {
+    "id": "trust_stale_review",
+    "mode": "synthetic",
+    "description": "Any stale citation should trigger manual review.",
+    "expectedDecision": "needs_review",
+    "payload": {
+      "requestId": "synthetic_stale",
+      "citations": [
+        {
+          "citationId": "cit_1",
+          "claim": "Claim",
+          "endnoteLabel": "1",
+          "confidence": 0.92,
+          "sourceId": "src_1",
+          "sourceUrl": "https://example.com/stale",
+          "sourceTitle": "Stale Source",
+          "stale": true,
+          "staleWarning": {
+            "reason": "source_outdated",
+            "checkedAt": "2026-04-28T00:00:00.000Z",
+            "recommendedAction": "refresh_source"
+          }
+        }
+      ],
+      "sources": [
+        {
+          "id": "src_1",
+          "title": "Stale Source",
+          "url": "https://example.com/stale",
+          "qualityTier": "high"
+        }
+      ],
+      "renderedText": "Claim[^1]",
+      "generatedAt": "2026-04-28T00:00:00.000Z",
+      "reliability": {
+        "averageConfidence": 0.92,
+        "citationsBelowThreshold": 0,
+        "staleCitationCount": 1,
+        "sourceQualityBreakdown": { "high": 1, "medium": 0, "low": 0 }
+      }
+    }
+  },
+  {
+    "id": "trust_low_tier_review",
+    "mode": "synthetic",
+    "description": "Low-tier sources should trigger manual review under default policy.",
+    "expectedDecision": "needs_review",
+    "payload": {
+      "requestId": "synthetic_low_tier",
+      "citations": [
+        {
+          "citationId": "cit_1",
+          "claim": "Claim",
+          "endnoteLabel": "1",
+          "confidence": 0.9,
+          "sourceId": "src_1",
+          "sourceUrl": "https://example.com/low",
+          "sourceTitle": "Low Tier Source",
+          "stale": false
+        }
+      ],
+      "sources": [
+        {
+          "id": "src_1",
+          "title": "Low Tier Source",
+          "url": "https://example.com/low",
+          "qualityTier": "low"
+        }
+      ],
+      "renderedText": "Claim[^1]",
+      "generatedAt": "2026-04-28T00:00:00.000Z",
+      "reliability": {
+        "averageConfidence": 0.9,
+        "citationsBelowThreshold": 0,
+        "staleCitationCount": 0,
+        "sourceQualityBreakdown": { "high": 0, "medium": 0, "low": 1 }
+      }
+    }
+  },
+  {
+    "id": "trust_low_confidence_review",
+    "mode": "synthetic",
+    "description": "Low average confidence should trigger manual review.",
+    "expectedDecision": "needs_review",
+    "payload": {
+      "requestId": "synthetic_low_confidence",
+      "citations": [
+        {
+          "citationId": "cit_1",
+          "claim": "Claim",
+          "endnoteLabel": "1",
+          "confidence": 0.62,
+          "sourceId": "src_1",
+          "sourceUrl": "https://example.com/confidence",
+          "sourceTitle": "Questionable Source",
+          "stale": false
+        }
+      ],
+      "sources": [
+        {
+          "id": "src_1",
+          "title": "Questionable Source",
+          "url": "https://example.com/confidence",
+          "qualityTier": "medium"
+        }
+      ],
+      "renderedText": "Claim[^1]",
+      "generatedAt": "2026-04-28T00:00:00.000Z",
+      "reliability": {
+        "averageConfidence": 0.62,
+        "citationsBelowThreshold": 1,
+        "staleCitationCount": 0,
+        "sourceQualityBreakdown": { "high": 0, "medium": 1, "low": 0 }
+      }
+    }
+  }
+]

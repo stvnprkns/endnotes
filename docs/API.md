@@ -75,7 +75,7 @@ Every response includes reliability signals designed for agent safety checks:
 ## JavaScript SDK
 
 ```ts
-import { EndnotesClient } from "endnotes"
+import { EndnotesClient, evaluateTrustPolicy } from "endnotes"
 
 const client = new EndnotesClient({ apiKey: process.env.ENDNOTES_API_KEY! })
 const result = await client.generate({
@@ -83,6 +83,11 @@ const result = await client.generate({
   style: "numeric",
   outputFormat: "markdown"
 })
+
+const trust = evaluateTrustPolicy(result)
+if (!trust.canPublish) {
+  // route to review workflow with trust.reasons
+}
 ```
 
 ## Error model

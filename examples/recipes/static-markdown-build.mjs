@@ -1,4 +1,4 @@
-import { EndnotesClient } from "../../src/index.ts"
+import { EndnotesClient, evaluateTrustPolicy } from "../../src/index.ts"
 import { readFile, writeFile } from "node:fs/promises"
 
 const client = new EndnotesClient({ apiKey: process.env.ENDNOTES_API_KEY })
@@ -9,6 +9,11 @@ const result = await client.generate({
   style: "numeric",
   outputFormat: "markdown"
 })
+const trust = evaluateTrustPolicy(result)
+
+if (!trust.canPublish) {
+  throw new Error(`Trust policy failed: ${trust.reasons.join(", ")}`)
+}
 
 await writeFile("content/article.md", result.renderedText)
 console.log("Wrote article with endnotes to content/article.md")

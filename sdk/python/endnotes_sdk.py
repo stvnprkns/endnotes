@@ -50,3 +50,50 @@ class EndnotesClient:
                 error.code,
                 details.get("retryable", error.code >= 500),
             ) from error
+
+
+def evaluate_trust_policy(
+    response: Dict[str, Any],
+    *,
+    min_average_confidence: float = 0.8,
+    min_citation_confidence: float = 0.7,
+    allow_low_tier_sources: bool = False,
+    max_stale_citations: int = 0,
+    max_citations_below_threshold: int = 0,
+) -> Dict[str, Any]:
+    reliability = response.get("reliability", {})
+    citations = response.get("citations", [])
+    sources = response.get("sources", [])
+    reasons = []
+
+    average_confidence = float(reliability.get("averageConfidence", 0))
+    citations_below_threshold = int(reliability.get("citationsBelowThreshold", 0))
+    stale_citation_count = int(reliability.get("staleCitationCount", 0))
+    low_tier_source_count = sum(1 for source in sources if source.get("qualityTier") == "low")
+    low_confidence_citation_count = sum(
+        1 for citation in citations if float(citation.get("confidence", 0)) < min_citation_confidence
+    )
+
+    if average_confidence < min_average_confidence:
+        reasons.append("average_confidence_below_threshold")
+    if citations_below_threshold > max_citations_below_threshold:
+        reasons.append("citations_below_threshold_present")
+    if stale_citation_count > max_stale_citations:
+        reasons.append("stale_citations_present")
+    if not allow_low_tier_sources and low_tier_source_count > 0:
+        reasons.append("low_tier_sources_present")
+    if low_confidence_citation_count > 0:
+        reasons.append("citation_confidence_below_policy")
+
+    return {
+        "canPublish": len(reasons) == 0,
+        "needsReview": len(reasons) > 0,
+        "reasons": reasons,
+        "summary": {
+            "averageConfidence": average_confidence,
+            "citationsBelowThreshold": citations_below_threshold,
+            "staleCitationCount": stale_citation_count,
+            "lowTierSourceCount": low_tier_source_count,
+            "lowConfidenceCitationCount": low_confidence_citation_count,
+        },
+    }

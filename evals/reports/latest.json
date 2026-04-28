@@ -1,0 +1,261 @@
+{
+  "generatedAt": "2026-04-28T22:59:47.045Z",
+  "apiBaseUrl": "http://localhost:8787/v1",
+  "total": 7,
+  "passRate": 1,
+  "policy": {
+    "minAverageConfidence": 0.8,
+    "minCitationConfidence": 0.7,
+    "allowLowTierSources": false,
+    "maxStaleCitations": 0,
+    "maxCitationsBelowThreshold": 0
+  },
+  "metrics": {
+    "publishableRate": 0.5714285714285714,
+    "manualReviewRate": 0.42857142857142855,
+    "sourceQualityCoverage": 1,
+    "staleSignalCoverage": 1,
+    "trustDecisionAccuracy": 1
+  },
+  "results": [
+    {
+      "id": "eval_001",
+      "dataset": "api",
+      "description": null,
+      "passed": true,
+      "status": 200,
+      "requestId": "dev_moj8auvt",
+      "reliability": {
+        "averageConfidence": 0.91,
+        "citationsBelowThreshold": 0,
+        "staleCitationCount": 0,
+        "sourceQualityBreakdown": {
+          "high": 1,
+          "medium": 0,
+          "low": 0
+        }
+      },
+      "passedSignals": {
+        "hasCitation": true,
+        "hasConfidence": true,
+        "hasQualityTier": true,
+        "hasReliabilitySummary": true,
+        "hasStaleSignal": true,
+        "hasStaleWarning": true
+      },
+      "trustDecision": {
+        "canPublish": true,
+        "needsReview": false,
+        "reasons": []
+      },
+      "expectedDecision": null,
+      "decisionMatchesExpectation": true
+    },
+    {
+      "id": "eval_002",
+      "dataset": "api",
+      "description": null,
+      "passed": true,
+      "status": 200,
+      "requestId": "dev_moj8auw1",
+      "reliability": {
+        "averageConfidence": 0.91,
+        "citationsBelowThreshold": 0,
+        "staleCitationCount": 0,
+        "sourceQualityBreakdown": {
+          "high": 1,
+          "medium": 0,
+          "low": 0
+        }
+      },
+      "passedSignals": {
+        "hasCitation": true,
+        "hasConfidence": true,
+        "hasQualityTier": true,
+        "hasReliabilitySummary": true,
+        "hasStaleSignal": true,
+        "hasStaleWarning": true
+      },
+      "trustDecision": {
+        "canPublish": true,
+        "needsReview": false,
+        "reasons": []
+      },
+      "expectedDecision": null,
+      "decisionMatchesExpectation": true
+    },
+    {
+      "id": "eval_003",
+      "dataset": "api",
+      "description": null,
+      "passed": true,
+      "status": 200,
+      "requestId": "dev_moj8auw4",
+      "reliability": {
+        "averageConfidence": 0.91,
+        "citationsBelowThreshold": 0,
+        "staleCitationCount": 0,
+        "sourceQualityBreakdown": {
+          "high": 1,
+          "medium": 0,
+          "low": 0
+        }
+      },
+      "passedSignals": {
+        "hasCitation": true,
+        "hasConfidence": true,
+        "hasQualityTier": true,
+        "hasReliabilitySummary": true,
+        "hasStaleSignal": true,
+        "hasStaleWarning": true
+      },
+      "trustDecision": {
+        "canPublish": true,
+        "needsReview": false,
+        "reasons": []
+      },
+      "expectedDecision": null,
+      "decisionMatchesExpectation": true
+    },
+    {
+      "id": "trust_publishable",
+      "dataset": "synthetic",
+      "description": "High-confidence output with no stale or low-tier signals should be publishable.",
+      "passed": true,
+      "status": 200,
+      "requestId": "synthetic_publishable",
+      "reliability": {
+        "averageConfidence": 0.93,
+        "citationsBelowThreshold": 0,
+        "staleCitationCount": 0,
+        "sourceQualityBreakdown": {
+          "high": 1,
+          "medium": 0,
+          "low": 0
+        }
+      },
+      "passedSignals": {
+        "hasCitation": true,
+        "hasConfidence": true,
+        "hasQualityTier": true,
+        "hasReliabilitySummary": true,
+        "hasStaleSignal": true,
+        "hasStaleWarning": true
+      },
+      "trustDecision": {
+        "canPublish": true,
+        "needsReview": false,
+        "reasons": []
+      },
+      "expectedDecision": "publishable",
+      "decisionMatchesExpectation": true
+    },
+    {
+      "id": "trust_stale_review",
+      "dataset": "synthetic",
+      "description": "Any stale citation should trigger manual review.",
+      "passed": true,
+      "status": 200,
+      "requestId": "synthetic_stale",
+      "reliability": {
+        "averageConfidence": 0.92,
+        "citationsBelowThreshold": 0,
+        "staleCitationCount": 1,
+        "sourceQualityBreakdown": {
+          "high": 1,
+          "medium": 0,
+          "low": 0
+        }
+      },
+      "passedSignals": {
+        "hasCitation": true,
+        "hasConfidence": true,
+        "hasQualityTier": true,
+        "hasReliabilitySummary": true,
+        "hasStaleSignal": true,
+        "hasStaleWarning": true
+      },
+      "trustDecision": {
+        "canPublish": false,
+        "needsReview": true,
+        "reasons": [
+          "stale_citations_present"
+        ]
+      },
+      "expectedDecision": "needs_review",
+      "decisionMatchesExpectation": true
+    },
+    {
+      "id": "trust_low_tier_review",
+      "dataset": "synthetic",
+      "description": "Low-tier sources should trigger manual review under default policy.",
+      "passed": true,
+      "status": 200,
+      "requestId": "synthetic_low_tier",
+      "reliability": {
+        "averageConfidence": 0.9,
+        "citationsBelowThreshold": 0,
+        "staleCitationCount": 0,
+        "sourceQualityBreakdown": {
+          "high": 0,
+          "medium": 0,
+          "low": 1
+        }
+      },
+      "passedSignals": {
+        "hasCitation": true,
+        "hasConfidence": true,
+        "hasQualityTier": true,
+        "hasReliabilitySummary": true,
+        "hasStaleSignal": true,
+        "hasStaleWarning": true
+      },
+      "trustDecision": {
+        "canPublish": false,
+        "needsReview": true,
+        "reasons": [
+          "low_tier_sources_present"
+        ]
+      },
+      "expectedDecision": "needs_review",
+      "decisionMatchesExpectation": true
+    },
+    {
+      "id": "trust_low_confidence_review",
+      "dataset": "synthetic",
+      "description": "Low average confidence should trigger manual review.",
+      "passed": true,
+      "status": 200,
+      "requestId": "synthetic_low_confidence",
+      "reliability": {
+        "averageConfidence": 0.62,
+        "citationsBelowThreshold": 1,
+        "staleCitationCount": 0,
+        "sourceQualityBreakdown": {
+          "high": 0,
+          "medium": 1,
+          "low": 0
+        }
+      },
+      "passedSignals": {
+        "hasCitation": true,
+        "hasConfidence": true,
+        "hasQualityTier": true,
+        "hasReliabilitySummary": true,
+        "hasStaleSignal": true,
+        "hasStaleWarning": true
+      },
+      "trustDecision": {
+        "canPublish": false,
+        "needsReview": true,
+        "reasons": [
+          "average_confidence_below_threshold",
+          "citations_below_threshold_present",
+          "citation_confidence_below_policy"
+        ]
+      },
+      "expectedDecision": "needs_review",
+      "decisionMatchesExpectation": true
+    }
+  ]
+}
