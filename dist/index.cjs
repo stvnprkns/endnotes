@@ -22,10 +22,17 @@ var index_exports = {};
 __export(index_exports, {
   Endnote: () => Endnote,
   Endnotes: () => Endnotes,
+  EndnotesApiError: () => EndnotesApiError,
+  EndnotesClient: () => EndnotesClient,
   EndnotesProvider: () => EndnotesProvider,
   Note: () => Note,
   Toaster: () => Toaster,
+  createHtmlEndnotesTransformer: () => createHtmlEndnotesTransformer,
+  createMarkdownEndnotesTransformer: () => createMarkdownEndnotesTransformer,
+  evaluateTrustPolicy: () => evaluateTrustPolicy,
   toaster: () => toaster,
+  transformHtmlEndnotes: () => transformHtmlEndnotes,
+  transformMarkdownEndnotes: () => transformMarkdownEndnotes,
   useEndnotes: () => useEndnotes
 });
 module.exports = __toCommonJS(index_exports);
@@ -69,6 +76,7 @@ function hashString(input) {
 }
 function fallbackIdentityFields(source) {
   return [
+    source.kind ?? "",
     source.title ?? "",
     source.source ?? "",
     source.date ?? "",
@@ -103,6 +111,17 @@ function sortRegisteredEndnotes(notes) {
   return [...notes].sort((first, second) => first.number - second.number);
 }
 
+// src/core/sourceKind.ts
+function inferEndnoteKind(source) {
+  if (source.kind) {
+    return source.kind;
+  }
+  if (source.href?.trim() || source.type) {
+    return "citation";
+  }
+  return "note";
+}
+
 // src/core/registry.ts
 function mergeSourceMetadata(existing, incoming, sourceKey) {
   if (existing.title && incoming.title && existing.title !== incoming.title) {
@@ -118,7 +137,11 @@ var EndnotesRegistry = class {
     this.notesByKey = /* @__PURE__ */ new Map();
   }
   register({ source, instanceId }) {
-    const key = resolveSourceKey(source);
+    const normalizedSource = {
+      ...source,
+      kind: inferEndnoteKind(source)
+    };
+    const key = resolveSourceKey(normalizedSource);
     const existing = this.notesByKey.get(key);
     if (existing) {
       const alreadyTracked = existing.instances.some(
@@ -127,14 +150,14 @@ var EndnotesRegistry = class {
       if (!alreadyTracked) {
         existing.instances.push({ instanceId, sourceKey: key });
       }
-      existing.source = mergeSourceMetadata(existing.source, source, key);
+      existing.source = mergeSourceMetadata(existing.source, normalizedSource, key);
       return existing;
     }
     const number = this.notesByKey.size + 1;
     const created = {
       key,
       number,
-      source,
+      source: normalizedSource,
       instances: [{ instanceId, sourceKey: key }]
     };
     this.notesByKey.set(key, created);
@@ -492,6 +515,7 @@ function normalizeTitle(title, children) {
   }
   return void 0;
 }
+var PREVIEW_EXIT_MS = 170;
 function Note({
   children,
   title,
@@ -503,14 +527,49 @@ function Note({
   const context = explicitContext ?? implicitContext;
   const reactId = (0, import_react3.useId)();
   const [registration, setRegistration] = (0, import_react3.useState)(null);
-  const [isPreviewVisible, setIsPreviewVisible] = (0, import_react3.useState)(false);
+  const [isPreviewMounted, setIsPreviewMounted] = (0, import_react3.useState)(false);
+  const [previewPhase, setPreviewPhase] = (0, import_react3.useState)("exiting");
   const [touchPreviewMode, setTouchPreviewMode] = (0, import_react3.useState)(false);
   const markerRootRef = (0, import_react3.useRef)(null);
+  const previewEnterRafRef = (0, import_react3.useRef)(null);
+  const previewCloseTimerRef = (0, import_react3.useRef)(null);
   const { registerSource: registerSource2, unregisterSourceInstance: unregisterSourceInstance2, markerIdFor: markerIdFor2, scrollToNote: scrollToNote2 } = context;
   const instanceId = (0, import_react3.useMemo)(() => reactId.replace(/:/g, ""), [reactId]);
   const resolvedTitle = normalizeTitle(title, children);
-  const openPreview = () => setIsPreviewVisible(true);
-  const closePreview = () => setIsPreviewVisible(false);
+  const clearPreviewTimers = () => {
+    if (previewEnterRafRef.current !== null) {
+      window.cancelAnimationFrame(previewEnterRafRef.current);
+      previewEnterRafRef.current = null;
+    }
+    if (previewCloseTimerRef.current !== null) {
+      window.clearTimeout(previewCloseTimerRef.current);
+      previewCloseTimerRef.current = null;
+    }
+  };
+  const openPreview = () => {
+    clearPreviewTimers();
+    if (!isPreviewMounted) {
+      setIsPreviewMounted(true);
+      setPreviewPhase("entering");
+      previewEnterRafRef.current = window.requestAnimationFrame(() => {
+        setPreviewPhase("open");
+        previewEnterRafRef.current = null;
+      });
+      return;
+    }
+    setPreviewPhase("open");
+  };
+  const closePreview = () => {
+    clearPreviewTimers();
+    if (!isPreviewMounted) {
+      return;
+    }
+    setPreviewPhase("exiting");
+    previewCloseTimerRef.current = window.setTimeout(() => {
+      setIsPreviewMounted(false);
+      previewCloseTimerRef.current = null;
+    }, PREVIEW_EXIT_MS);
+  };
   (0, import_react3.useEffect)(() => {
     if (!source.id && !source.href && !resolvedTitle && !source.source) {
       warnOnce("Note received minimal metadata. Provide at least id, href, title, or source.");
@@ -537,6 +596,7 @@ function Note({
     source.href,
     source.id,
     source.quote,
+    source.kind,
     source.source,
     source.supports,
     source.type,
@@ -555,13 +615,18 @@ function Note({
       if (next && root.contains(next)) {
         return;
       }
-      setIsPreviewVisible(false);
+      closePreview();
     };
     root.addEventListener("focusout", onFocusOut);
     return () => {
       root.removeEventListener("focusout", onFocusOut);
     };
-  }, [touchPreviewMode, registration?.sourceKey ?? null]);
+  }, [touchPreviewMode, registration?.sourceKey ?? null, isPreviewMounted]);
+  (0, import_react3.useEffect)(() => {
+    return () => {
+      clearPreviewTimers();
+    };
+  }, []);
   if (!registration) {
     return /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
       "span",
@@ -585,7 +650,11 @@ function Note({
   const handleMarkerClick = (event) => {
     if (touchPreviewMode) {
       event.preventDefault();
-      setIsPreviewVisible((current) => !current);
+      if (isPreviewMounted && previewPhase !== "exiting") {
+        closePreview();
+      } else {
+        openPreview();
+      }
       return;
     }
     event.preventDefault();
@@ -621,7 +690,7 @@ function Note({
               context.activeMarkerInstanceId === instanceId ? "is-active" : void 0
             ),
             "aria-label": formatMarkerLabel(number, resolvedTitle),
-            "aria-describedby": isPreviewVisible ? previewId : void 0,
+            "aria-describedby": isPreviewMounted && previewPhase !== "exiting" ? previewId : void 0,
             onPointerDown: (event) => {
               if (event.pointerType === "touch") {
                 setTouchPreviewMode(true);
@@ -639,25 +708,40 @@ function Note({
             children: number
           }
         ) }),
-        isPreviewVisible ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { id: previewId, role: "region", "aria-label": previewRegionLabel, className: "endnotes-preview-card", children: [
-          /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "endnotes-preview-title", children: previewTitle }),
-          previewMeta ? /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "endnotes-preview-meta", children: previewMeta }) : null,
-          registeredSource?.quote ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "endnotes-preview-quote", children: [
-            '"',
-            registeredSource.quote,
-            '"'
-          ] }) : null,
-          registeredSource?.href ? isSafePreviewHref(registeredSource.href) ? /^https?:\/\//i.test(registeredSource.href) ? /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
-            "a",
-            {
-              className: "endnotes-preview-href",
-              href: registeredSource.href,
-              target: "_blank",
-              rel: "noopener noreferrer",
-              children: registeredSource.href
-            }
-          ) : /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("a", { className: "endnotes-preview-href", href: registeredSource.href, children: registeredSource.href }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "endnotes-preview-href", children: registeredSource.href }) : null
-        ] }) : null
+        isPreviewMounted ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)(
+          "span",
+          {
+            id: previewId,
+            role: previewPhase === "exiting" ? void 0 : "region",
+            "aria-label": previewPhase === "exiting" ? void 0 : previewRegionLabel,
+            "aria-hidden": previewPhase === "exiting" ? "true" : void 0,
+            className: joinClassNames(
+              "endnotes-preview-card",
+              previewPhase === "entering" ? "is-entering" : void 0,
+              previewPhase === "open" ? "is-open" : void 0,
+              previewPhase === "exiting" ? "is-exiting" : void 0
+            ),
+            children: [
+              /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "endnotes-preview-title", children: previewTitle }),
+              previewMeta ? /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "endnotes-preview-meta", children: previewMeta }) : null,
+              registeredSource?.quote ? /* @__PURE__ */ (0, import_jsx_runtime3.jsxs)("span", { className: "endnotes-preview-quote", children: [
+                '"',
+                registeredSource.quote,
+                '"'
+              ] }) : null,
+              registeredSource?.href ? isSafePreviewHref(registeredSource.href) ? /^https?:\/\//i.test(registeredSource.href) ? /* @__PURE__ */ (0, import_jsx_runtime3.jsx)(
+                "a",
+                {
+                  className: "endnotes-preview-href",
+                  href: registeredSource.href,
+                  target: "_blank",
+                  rel: "noopener noreferrer",
+                  children: registeredSource.href
+                }
+              ) : /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("a", { className: "endnotes-preview-href", href: registeredSource.href, children: registeredSource.href }) : /* @__PURE__ */ (0, import_jsx_runtime3.jsx)("span", { className: "endnotes-preview-href", children: registeredSource.href }) : null
+            ]
+          }
+        ) : null
       ]
     }
   );
@@ -701,7 +785,11 @@ function metadata(note) {
   return parts.join(" \u2022 ");
 }
 function supportingSentence(note) {
-  return note.source.description ?? note.source.supports ?? note.source.quote ?? note.source.source ?? metadata(note) ?? null;
+  const kind = inferEndnoteKind(note.source);
+  if (kind === "citation") {
+    return note.source.source ?? metadata(note) ?? note.source.description ?? note.source.supports ?? note.source.quote ?? null;
+  }
+  return note.source.description ?? note.source.supports ?? note.source.quote ?? metadata(note) ?? null;
 }
 function Endnotes({ title, heading, className }) {
   const explicitContext = useEndnotesContextOptional();
@@ -726,8 +814,9 @@ function Endnotes({ title, heading, className }) {
           /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("div", { className: "endnotes-sectionHeader-divider", "aria-hidden": "true" })
         ] }),
         /* @__PURE__ */ (0, import_jsx_runtime5.jsx)("ol", { className: "endnotes-list", children: context.notes.map((note) => {
+          const kind = inferEndnoteKind(note.source);
           const sanitizedHref = sanitizeHref(note.source.href);
-          const titleText = note.source.title ?? note.source.href ?? "Untitled source";
+          const titleText = note.source.title ?? note.source.href ?? (kind === "note" ? "Note" : "Untitled source");
           const sentence = supportingSentence(note);
           return /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
             "li",
@@ -737,8 +826,10 @@ function Endnotes({ title, heading, className }) {
               tabIndex: -1,
               className: joinClassNames2(
                 "endnotes-item",
+                `endnotes-item--${kind}`,
                 context.activeNoteKey === note.key ? "is-active" : void 0
               ),
+              "data-endnote-kind": kind,
               children: /* @__PURE__ */ (0, import_jsx_runtime5.jsxs)("p", { className: "endnotes-footnote-p", children: [
                 sanitizedHref ? /* @__PURE__ */ (0, import_jsx_runtime5.jsx)(
                   "a",
@@ -1135,14 +1226,360 @@ function Toaster({
     }
   );
 }
+
+// src/api/client.ts
+var EndnotesApiError = class extends Error {
+  constructor(message, details) {
+    super(message);
+    this.name = "EndnotesApiError";
+    this.code = details.code;
+    this.status = details.status;
+    this.retryable = details.retryable;
+  }
+};
+var EndnotesClient = class {
+  constructor(options) {
+    this.apiKey = options.apiKey;
+    this.baseUrl = options.baseUrl ?? "https://api.endnotes.ai/v1";
+    this.timeoutMs = options.timeoutMs ?? 1e4;
+    this.appName = options.appName;
+    this.appVersion = options.appVersion;
+    this.onMetric = options.onMetric;
+    this.onTrace = options.onTrace;
+    this.onSourceAttribution = options.onSourceAttribution;
+  }
+  buildReplayRequest(request) {
+    return {
+      method: "POST",
+      url: `${this.baseUrl}/endnotes:generate`,
+      headers: {
+        "content-type": "application/json",
+        authorization: "Bearer <ENDNOTES_API_KEY>",
+        "x-endnotes-client": this.clientHeader()
+      },
+      body: JSON.stringify(request)
+    };
+  }
+  async generate(request) {
+    const traceId = this.traceId();
+    const startedAt = Date.now();
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), this.timeoutMs);
+    this.onTrace?.({
+      phase: "request_started",
+      traceId,
+      route: "/v1/endnotes:generate"
+    });
+    try {
+      const response = await fetch(`${this.baseUrl}/endnotes:generate`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          authorization: `Bearer ${this.apiKey}`,
+          "x-endnotes-client": this.clientHeader()
+        },
+        body: JSON.stringify(request),
+        signal: controller.signal
+      });
+      if (!response.ok) {
+        const payload2 = await response.json().catch(() => null);
+        this.onTrace?.({
+          phase: "request_failed",
+          traceId,
+          route: "/v1/endnotes:generate",
+          status: response.status,
+          durationMs: Date.now() - startedAt,
+          errorCode: payload2?.error.code ?? "unknown_error"
+        });
+        this.onMetric?.({
+          name: "endnotes.activation.failure",
+          value: 1,
+          tags: { code: payload2?.error.code ?? "unknown_error" }
+        });
+        throw new EndnotesApiError(payload2?.error.message ?? "Endnotes API request failed", {
+          code: payload2?.error.code ?? "unknown_error",
+          status: response.status,
+          retryable: payload2?.error.retryable ?? response.status >= 500
+        });
+      }
+      this.onMetric?.({ name: "endnotes.activation.success", value: 1 });
+      const payload = await response.json();
+      this.onMetric?.({
+        name: payload.reliability.citationsBelowThreshold === 0 ? "endnotes.trust.publishable" : "endnotes.trust.needs_review",
+        value: 1
+      });
+      this.onMetric?.({
+        name: "endnotes.trust.citations_below_threshold",
+        value: payload.reliability.citationsBelowThreshold
+      });
+      this.onMetric?.({
+        name: "endnotes.trust.stale_citations",
+        value: payload.reliability.staleCitationCount
+      });
+      const sourceById = new Map(payload.sources.map((source) => [source.id, source]));
+      this.onTrace?.({
+        phase: "request_succeeded",
+        traceId,
+        route: "/v1/endnotes:generate",
+        status: response.status,
+        durationMs: Date.now() - startedAt
+      });
+      this.onSourceAttribution?.({
+        requestId: payload.requestId,
+        mapping: payload.citations.map((citation) => {
+          const source = sourceById.get(citation.sourceId);
+          return {
+            citationId: citation.citationId,
+            sourceId: citation.sourceId,
+            sourceUrl: citation.sourceUrl,
+            confidence: citation.confidence,
+            stale: citation.stale,
+            sourceQualityTier: source?.qualityTier,
+            staleWarningReason: citation.staleWarning?.reason
+          };
+        })
+      });
+      return payload;
+    } catch (error) {
+      if (error instanceof EndnotesApiError) {
+        throw error;
+      }
+      if (error instanceof DOMException && error.name === "AbortError") {
+        this.onTrace?.({
+          phase: "request_failed",
+          traceId,
+          route: "/v1/endnotes:generate",
+          status: 408,
+          durationMs: Date.now() - startedAt,
+          errorCode: "timeout"
+        });
+        throw new EndnotesApiError("Endnotes API request timed out", {
+          code: "timeout",
+          status: 408,
+          retryable: true
+        });
+      }
+      this.onTrace?.({
+        phase: "request_failed",
+        traceId,
+        route: "/v1/endnotes:generate",
+        status: 0,
+        durationMs: Date.now() - startedAt,
+        errorCode: "network_error"
+      });
+      throw new EndnotesApiError("Network error while calling Endnotes API", {
+        code: "network_error",
+        status: 0,
+        retryable: true
+      });
+    } finally {
+      this.onMetric?.({
+        name: "endnotes.request.latency_ms",
+        value: Date.now() - startedAt
+      });
+      clearTimeout(timeout);
+    }
+  }
+  clientHeader() {
+    const version = "endnotes-ts/0.1.0";
+    if (!this.appName) {
+      return version;
+    }
+    const appVersion = this.appVersion ? `/${this.appVersion}` : "";
+    return `${version} ${this.appName}${appVersion}`;
+  }
+  traceId() {
+    return `trace_${Date.now().toString(36)}`;
+  }
+};
+
+// src/api/trust.ts
+var DEFAULT_POLICY = {
+  minAverageConfidence: 0.8,
+  minCitationConfidence: 0.7,
+  allowLowTierSources: false,
+  maxStaleCitations: 0,
+  maxCitationsBelowThreshold: 0
+};
+function evaluateTrustPolicy(response, options = {}) {
+  const policy = { ...DEFAULT_POLICY, ...options };
+  const reasons = [];
+  const lowTierSourceCount = countLowTierSources(response.sources);
+  const citationsBelowConfidence = countCitationsBelowConfidence(
+    response.citations,
+    policy.minCitationConfidence
+  );
+  if (response.reliability.averageConfidence < policy.minAverageConfidence) {
+    reasons.push("average_confidence_below_threshold");
+  }
+  if (response.reliability.citationsBelowThreshold > policy.maxCitationsBelowThreshold) {
+    reasons.push("citations_below_threshold_present");
+  }
+  if (response.reliability.staleCitationCount > policy.maxStaleCitations) {
+    reasons.push("stale_citations_present");
+  }
+  if (!policy.allowLowTierSources && lowTierSourceCount > 0) {
+    reasons.push("low_tier_sources_present");
+  }
+  if (citationsBelowConfidence > 0) {
+    reasons.push("citation_confidence_below_policy");
+  }
+  return {
+    canPublish: reasons.length === 0,
+    needsReview: reasons.length > 0,
+    reasons,
+    summary: {
+      averageConfidence: response.reliability.averageConfidence,
+      citationsBelowThreshold: response.reliability.citationsBelowThreshold,
+      staleCitationCount: response.reliability.staleCitationCount,
+      lowTierSourceCount
+    }
+  };
+}
+function countLowTierSources(sources) {
+  return sources.filter((source) => source.qualityTier === "low").length;
+}
+function countCitationsBelowConfidence(citations, minCitationConfidence) {
+  return citations.filter((citation) => citation.confidence < minCitationConfidence).length;
+}
+
+// src/markdown/index.ts
+var MARKER_PATTERN = /\[\^endnote\s+([^\]]+)\]/g;
+var ATTRIBUTE_PATTERN = /([a-zA-Z_]+)="([^"]*)"/g;
+function parseAttributes(raw) {
+  const attributes = {};
+  let match = ATTRIBUTE_PATTERN.exec(raw);
+  while (match) {
+    attributes[match[1]] = match[2];
+    match = ATTRIBUTE_PATTERN.exec(raw);
+  }
+  ATTRIBUTE_PATTERN.lastIndex = 0;
+  return attributes;
+}
+function normalizeKind(value) {
+  if (value === "citation" || value === "note") {
+    return value;
+  }
+  return "citation";
+}
+function transformMarkdownEndnotes(input, options = {}) {
+  const endnotes = [];
+  let nextIndex = 1;
+  const markdownBody = input.replace(MARKER_PATTERN, (_token, rawAttributes) => {
+    const attrs = parseAttributes(rawAttributes);
+    const title = attrs.title?.trim();
+    if (!title) {
+      return _token;
+    }
+    const note = {
+      index: nextIndex,
+      title,
+      href: attrs.href?.trim() || void 0,
+      kind: normalizeKind(attrs.kind)
+    };
+    endnotes.push(note);
+    nextIndex += 1;
+    return `[^${note.index}]`;
+  });
+  if (endnotes.length === 0) {
+    return { markdown: input, endnotes };
+  }
+  const definitions = endnotes.map((note) => {
+    const label = note.href ? `[${note.title}](${note.href})` : note.title;
+    const kindSuffix = note.kind === "note" ? " (note)" : "";
+    return `[^${note.index}]: ${label}${kindSuffix}`;
+  });
+  const appendDefinitions = options.appendDefinitions ?? true;
+  const markdown = appendDefinitions ? `${markdownBody.trimEnd()}
+
+${definitions.join("\n")}
+` : markdownBody;
+  return { markdown, endnotes };
+}
+function createMarkdownEndnotesTransformer(options = {}) {
+  return (input) => transformMarkdownEndnotes(input, options).markdown;
+}
+
+// src/html/index.ts
+var HTML_ENDNOTE_TAG = /<endnote\s+([^>]*)>([\s\S]*?)<\/endnote>/gi;
+var ATTRIBUTE_PATTERN2 = /([a-zA-Z_]+)="([^"]*)"/g;
+function parseAttributes2(raw) {
+  const attributes = {};
+  let match = ATTRIBUTE_PATTERN2.exec(raw);
+  while (match) {
+    attributes[match[1]] = match[2];
+    match = ATTRIBUTE_PATTERN2.exec(raw);
+  }
+  ATTRIBUTE_PATTERN2.lastIndex = 0;
+  return attributes;
+}
+function escapeHtml(value) {
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+function transformHtmlEndnotes(input, options = {}) {
+  let markerCounter = 0;
+  let markdownProxy = input.replace(HTML_ENDNOTE_TAG, (_full, rawAttributes, content) => {
+    markerCounter += 1;
+    const attrs = parseAttributes2(rawAttributes);
+    const title = (attrs.title ?? content ?? "").trim();
+    const href = attrs.href?.trim();
+    const kind = attrs.kind === "note" ? "note" : "citation";
+    if (!title) {
+      return _full;
+    }
+    const segments = [`title="${title.replace(/"/g, '\\"')}"`];
+    if (href) {
+      segments.push(`href="${href.replace(/"/g, '\\"')}"`);
+    }
+    if (kind === "note") {
+      segments.push(`kind="note"`);
+    }
+    return `[^endnote ${segments.join(" ")}]`;
+  });
+  if (markerCounter === 0) {
+    return { html: input, endnotes: [] };
+  }
+  const transformed = transformMarkdownEndnotes(markdownProxy);
+  if (transformed.endnotes.length === 0) {
+    return { html: input, endnotes: [] };
+  }
+  let body = transformed.markdown;
+  transformed.endnotes.forEach((note) => {
+    body = body.replace(
+      `[^${note.index}]`,
+      `<sup class="endnotes-marker"><a href="#endnote-${note.index}" id="endnote-ref-${note.index}">${note.index}</a></sup>`
+    );
+  });
+  const listItems = transformed.endnotes.map((note) => {
+    const content = note.href ? `<a href="${escapeHtml(note.href)}">${escapeHtml(note.title)}</a>` : escapeHtml(note.title);
+    const kind = note.kind === "note" ? "note" : "citation";
+    return `<li id="endnote-${note.index}" data-endnote-kind="${kind}">${content} <a href="#endnote-ref-${note.index}" aria-label="Back to reference ${note.index}">\u21A9</a></li>`;
+  });
+  const includeSection = options.includeSection ?? true;
+  const section = `<section class="endnotes-html" aria-label="Endnotes"><ol>${listItems.join("")}</ol></section>
+`;
+  const html = `${body.replace(/\[\^\d+\]:[^\n]*(\n|$)/g, "").trimEnd()}
+${includeSection ? section : ""}`;
+  return { html, endnotes: transformed.endnotes };
+}
+function createHtmlEndnotesTransformer(options = {}) {
+  return (input) => transformHtmlEndnotes(input, options).html;
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   Endnote,
   Endnotes,
+  EndnotesApiError,
+  EndnotesClient,
   EndnotesProvider,
   Note,
   Toaster,
+  createHtmlEndnotesTransformer,
+  createMarkdownEndnotesTransformer,
+  evaluateTrustPolicy,
   toaster,
+  transformHtmlEndnotes,
+  transformMarkdownEndnotes,
   useEndnotes
 });
 //# sourceMappingURL=index.cjs.map

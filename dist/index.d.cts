@@ -1,6 +1,7 @@
 import { ReactNode, JSX } from 'react';
 
 type EndnoteSourceType = "article" | "paper" | "book" | "report" | "website" | "dataset" | "internal" | "other";
+type EndnoteKind = "citation" | "note";
 type EndnoteSource = {
     id?: string;
     href?: string;
@@ -13,6 +14,7 @@ type EndnoteSource = {
     supports?: string;
     description?: string;
     type?: EndnoteSourceType;
+    kind?: EndnoteKind;
 };
 type EndnoteTheme = {
     fontFamily?: string;
@@ -140,4 +142,172 @@ declare const toaster: ((content: ToastContent, options?: ToastOptions) => strin
     promise: typeof promiseToast;
 };
 
-export { Endnote, Endnotes, type EndnotesProps, EndnotesProvider, type EndnotesTheme, Note, type NoteProps, type ToastOptions, type ToastPosition, type ToastType, Toaster, type ToasterProps, toaster, useEndnotes };
+type EndnotesOutputFormat = "markdown" | "html" | "json";
+interface EndnotesSource {
+    id: string;
+    title: string;
+    url: string;
+    publisher?: string;
+    publishedAt?: string;
+    qualityTier?: "high" | "medium" | "low";
+}
+interface EndnotesCitation {
+    citationId: string;
+    claim: string;
+    endnoteLabel: string;
+    confidence: number;
+    sourceId: string;
+    sourceUrl: string;
+    sourceTitle: string;
+    stale: boolean;
+    staleWarning?: {
+        reason: "source_unreachable" | "source_moved" | "source_outdated";
+        checkedAt: string;
+        recommendedAction: "refresh_source" | "replace_source" | "manual_review";
+    };
+}
+interface GenerateEndnotesRequest {
+    draft: string;
+    style?: "numeric" | "author-date";
+    outputFormat?: EndnotesOutputFormat;
+    locale?: string;
+    metadata?: Record<string, string>;
+}
+interface GenerateEndnotesResponse {
+    requestId: string;
+    citations: EndnotesCitation[];
+    sources: EndnotesSource[];
+    renderedText: string;
+    generatedAt: string;
+    reliability: {
+        averageConfidence: number;
+        citationsBelowThreshold: number;
+        staleCitationCount: number;
+        sourceQualityBreakdown: {
+            high: number;
+            medium: number;
+            low: number;
+        };
+    };
+}
+interface EndnotesReplayRequest {
+    method: "POST";
+    url: string;
+    headers: Record<string, string>;
+    body: string;
+}
+
+type EndnotesMetricName = "endnotes.activation.success" | "endnotes.activation.failure" | "endnotes.request.latency_ms" | "endnotes.trust.publishable" | "endnotes.trust.needs_review" | "endnotes.trust.citations_below_threshold" | "endnotes.trust.stale_citations";
+interface EndnotesMetric {
+    name: EndnotesMetricName;
+    value: number;
+    tags?: Record<string, string>;
+}
+type EndnotesMetricHandler = (metric: EndnotesMetric) => void;
+interface EndnotesTraceEvent {
+    phase: "request_started" | "request_succeeded" | "request_failed";
+    traceId: string;
+    route: string;
+    status?: number;
+    durationMs?: number;
+    errorCode?: string;
+}
+type EndnotesTraceHandler = (trace: EndnotesTraceEvent) => void;
+interface EndnotesSourceAttributionEvent {
+    requestId: string;
+    mapping: Array<{
+        citationId: string;
+        sourceId: string;
+        sourceUrl: string;
+        confidence: number;
+        stale: boolean;
+        sourceQualityTier?: "high" | "medium" | "low";
+        staleWarningReason?: "source_unreachable" | "source_moved" | "source_outdated";
+    }>;
+}
+type EndnotesSourceAttributionHandler = (sourceAttribution: EndnotesSourceAttributionEvent) => void;
+
+interface EndnotesClientOptions {
+    apiKey: string;
+    baseUrl?: string;
+    timeoutMs?: number;
+    appName?: string;
+    appVersion?: string;
+    onMetric?: EndnotesMetricHandler;
+    onTrace?: EndnotesTraceHandler;
+    onSourceAttribution?: EndnotesSourceAttributionHandler;
+}
+declare class EndnotesApiError extends Error {
+    readonly code: string;
+    readonly status: number;
+    readonly retryable: boolean;
+    constructor(message: string, details: {
+        code: string;
+        status: number;
+        retryable: boolean;
+    });
+}
+declare class EndnotesClient {
+    private readonly apiKey;
+    private readonly baseUrl;
+    private readonly timeoutMs;
+    private readonly appName?;
+    private readonly appVersion?;
+    private readonly onMetric?;
+    private readonly onTrace?;
+    private readonly onSourceAttribution?;
+    constructor(options: EndnotesClientOptions);
+    buildReplayRequest(request: GenerateEndnotesRequest): EndnotesReplayRequest;
+    generate(request: GenerateEndnotesRequest): Promise<GenerateEndnotesResponse>;
+    private clientHeader;
+    private traceId;
+}
+
+interface EndnotesTrustPolicyOptions {
+    minAverageConfidence?: number;
+    minCitationConfidence?: number;
+    allowLowTierSources?: boolean;
+    maxStaleCitations?: number;
+    maxCitationsBelowThreshold?: number;
+}
+interface EndnotesTrustDecision {
+    canPublish: boolean;
+    needsReview: boolean;
+    reasons: string[];
+    summary: {
+        averageConfidence: number;
+        citationsBelowThreshold: number;
+        staleCitationCount: number;
+        lowTierSourceCount: number;
+    };
+}
+declare function evaluateTrustPolicy(response: GenerateEndnotesResponse, options?: EndnotesTrustPolicyOptions): EndnotesTrustDecision;
+
+type MarkdownEndnoteKind = "citation" | "note";
+type MarkdownEndnote = {
+    index: number;
+    title: string;
+    href?: string;
+    kind: MarkdownEndnoteKind;
+};
+type TransformMarkdownEndnotesResult = {
+    markdown: string;
+    endnotes: MarkdownEndnote[];
+};
+type MarkdownTransformerOptions = {
+    appendDefinitions?: boolean;
+};
+declare function transformMarkdownEndnotes(input: string, options?: MarkdownTransformerOptions): TransformMarkdownEndnotesResult;
+declare function createMarkdownEndnotesTransformer(options?: MarkdownTransformerOptions): (input: string) => string;
+
+type TransformHtmlEndnotesResult = {
+    html: string;
+    endnotes: MarkdownEndnote[];
+};
+type HtmlTransformerOptions = {
+    includeSection?: boolean;
+};
+declare function transformHtmlEndnotes(input: string, options?: HtmlTransformerOptions): TransformHtmlEndnotesResult;
+declare function createHtmlEndnotesTransformer(options?: HtmlTransformerOptions): (input: string) => string;
+
+export { Endnote, Endnotes, EndnotesApiError, type EndnotesCitation, EndnotesClient, type EndnotesMetric, type EndnotesMetricHandler, type EndnotesMetricName, type EndnotesOutputFormat, type EndnotesProps, EndnotesProvider, type EndnotesReplayRequest, type EndnotesSource, type EndnotesSourceAttributionEvent, type EndnotesSourceAttributionHandler, type EndnotesTheme, type EndnotesTraceEvent, type EndnotesTraceHandler, type EndnotesTrustDecision, type EndnotesTrustPolicyOptions, type GenerateEndnotesRequest, type GenerateEndnotesResponse, type HtmlTransformerOptions, type MarkdownEndnote, type MarkdownEndnoteKind, type MarkdownTransformerOptions, Note, type NoteProps, type ToastOptions, type ToastPosition, type ToastType, Toaster, type ToasterProps, type TransformHtmlEndnotesResult, type TransformMarkdownEndnotesResult, createHtmlEndnotesTransformer, createMarkdownEndnotesTransformer, evaluateTrustPolicy, toaster, transformHtmlEndnotes, transformMarkdownEndnotes, useEndnotes };

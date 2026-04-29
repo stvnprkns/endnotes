@@ -25,10 +25,10 @@ function parseAttributes(raw: string): Record<string, string> {
 
 function escapeHtml(value: string): string {
   return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
 }
 
 export function transformHtmlEndnotes(
@@ -47,9 +47,9 @@ export function transformHtmlEndnotes(
       return _full
     }
 
-    const segments = [`title="${title.replaceAll('"', '\\"')}"`]
+    const segments = [`title="${title.replace(/"/g, '\\"')}"`]
     if (href) {
-      segments.push(`href="${href.replaceAll('"', '\\"')}"`)
+      segments.push(`href="${href.replace(/"/g, '\\"')}"`)
     }
     if (kind === "note") {
       segments.push(`kind="note"`)

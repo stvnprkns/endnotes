@@ -260,6 +260,15 @@
   color: inherit;
 }
 
+.endnotes-item--citation .endnotes-title {
+  font-weight: 600;
+}
+
+.endnotes-item--note .endnotes-title {
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
 .endnotes-title-link {
   color: var(--endnotes-link-idle);
   text-decoration: none;
@@ -280,6 +289,10 @@
   font-size: inherit;
   line-height: inherit;
   color: var(--endnotes-copy-color);
+}
+
+.endnotes-item--note .endnotes-sentence {
+  color: color-mix(in oklab, var(--endnotes-copy-color) 88%, var(--endnotes-muted) 12%);
 }
 
 .endnotes-section .endnotes-links {
