@@ -81,6 +81,16 @@ Inference defaults for generated UI payloads are non-breaking:
 - MDX blog: convert markdown references into `<Note />` via MDX components.
 - Docs site: wrap docs shell with `<EndnotesProvider>`, render `<Endnotes />` in page template.
 
+## Cross-format marker contract (`.md`, `.mdx`, HTML)
+
+Canonical markdown marker:
+
+```md
+[^endnote title="Source title" href="https://example.com/source" kind="citation"]
+```
+
+Use `transformMarkdownEndnotes()` for markdown/MDX and `transformHtmlEndnotes()` for HTML fallback paths.
+
 ## Error handling decision tree
 
 - `retryable: true` -> retry with exponential backoff (max 3)

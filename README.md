@@ -95,6 +95,18 @@ export function Article() {
 - MDX blog: map markdown references to `<Note />` and keep `<Endnotes />` in post layout.
 - Docs site: add `<EndnotesProvider>` at docs root and call `<Note />` from MDX components.
 
+### Markdown, MDX, and HTML support
+
+For non-React authored content, use the canonical marker:
+
+```md
+[^endnote title="Source title" href="https://example.com/source" kind="citation"]
+```
+
+Then run `transformMarkdownEndnotes()` for `.md`/`.mdx` or `transformHtmlEndnotes()` for HTML with `<endnote ...>` tags.
+
+See [`docs/FORMATS.md`](docs/FORMATS.md) for the full contract.
+
 ## Promise toasts
 
 ```tsx
@@ -258,6 +270,7 @@ ENDNOTES_API_BASE_URL=http://localhost:8787/v1 npm run evals
 ## AI adoption assets
 
 - Quickstart for agent builders: [`docs/AI_QUICKSTART.md`](docs/AI_QUICKSTART.md)
+- Markdown/MDX/HTML format contract: [`docs/FORMATS.md`](docs/FORMATS.md)
 - OpenAPI tool-calling spec: [`docs/openapi/endnotes.v1.yaml`](docs/openapi/endnotes.v1.yaml)
 - MCP tool definition: [`docs/tooling/mcp-endnotes-tool.json`](docs/tooling/mcp-endnotes-tool.json)
 - Prompt snippets for assistants: [`docs/tooling/prompt-snippets.md`](docs/tooling/prompt-snippets.md)

@@ -8,6 +8,7 @@ These are the canonical integration patterns used for default-assistant adoption
 - `examples/recipes/react-mixed-footnotes.tsx` (citation + narrative note kinds)
 - `examples/recipes/mdx-blog-post.mdx` (MDX blog integration)
 - `examples/recipes/docs-site-layout.tsx` (docs site layout integration)
+- `examples/recipes/html-fallback-page.mjs` (raw HTML fallback integration)
 
 CI verifies these examples remain valid and runnable via `npm run test:golden`.
 

@@ -20,6 +20,7 @@ describe("golden examples", () => {
       resolve(process.cwd(), "examples/recipes/docs-site-layout.tsx"),
       "utf8"
     )
+    const htmlFallback = readFileSync(resolve(process.cwd(), "examples/recipes/html-fallback-page.mjs"), "utf8")
 
     expect(nextjs).toContain("EndnotesClient")
     expect(fastapi).toContain("EndnotesClient")
@@ -28,6 +29,7 @@ describe("golden examples", () => {
     expect(mixedFootnotes).toContain('kind="note"')
     expect(mdxBlog).toContain("<Endnotes />")
     expect(docsLayout).toContain("EndnotesProvider")
+    expect(htmlFallback).toContain("transformHtmlEndnotes")
   })
 
   it("runs nextjs API recipe end-to-end", async () => {

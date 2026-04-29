@@ -6,6 +6,8 @@ export { Toaster } from "./components/Toaster"
 export { toaster } from "./toaster/store"
 export { EndnotesClient, EndnotesApiError } from "./api/client"
 export { evaluateTrustPolicy } from "./api/trust"
+export { createMarkdownEndnotesTransformer, transformMarkdownEndnotes } from "./markdown"
+export { createHtmlEndnotesTransformer, transformHtmlEndnotes } from "./html"
 
 export type {
   EndnotesTheme,
@@ -14,6 +16,14 @@ export type {
 } from "./types/endnotes"
 export type { ToastOptions, ToastPosition, ToastType, ToasterProps } from "./types/toaster"
 export type { EndnotesTrustDecision, EndnotesTrustPolicyOptions } from "./api/trust"
+export type {
+  MarkdownEndnote,
+  MarkdownEndnoteKind,
+  MarkdownTransformerOptions,
+  TransformMarkdownEndnotesResult
+} from "./markdown"
+export type { TransformHtmlEndnotesResult } from "./html"
+export type { HtmlTransformerOptions } from "./html"
 export type {
   EndnotesCitation,
   EndnotesOutputFormat,

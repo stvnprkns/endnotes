@@ -34,6 +34,9 @@ jobs:
       - name: Golden examples verification
         run: npm run test:golden --if-present
 
+      - name: Markdown and HTML format verification
+        run: npm run test:formats --if-present
+
       - name: Contract conformance verification
         run: npm run test:contracts --if-present
 
