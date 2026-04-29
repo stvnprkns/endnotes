@@ -41,8 +41,8 @@ This will:
 
 ## Next Phase 3 steps
 
-- Ship onboarding/free-tier docs and activation funnel instrumentation updates.
 - Expand local/CI trust operations with API key lifecycle verification and usage summaries.
+- Add live-provider comparison adapters beyond synthetic profiles.
 
 ## Comparison runners (shipped)
 
@@ -54,3 +54,9 @@ Named alternative comparison runners now generate a public comparison scorecard:
   - `endnotes`
   - `generic_rag_citations`
   - `manual_footnotes`
+
+## Onboarding and growth artifacts (shipped)
+
+- onboarding/free-tier spec: [`docs/ONBOARDING_FREE_TIER.md`](docs/ONBOARDING_FREE_TIER.md)
+- weekly scheduled reliability automation: `.github/workflows/weekly-reliability.yml`
+- threshold governance policy: [`docs/SCORECARD_GOVERNANCE.md`](docs/SCORECARD_GOVERNANCE.md)

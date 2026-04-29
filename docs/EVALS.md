@@ -112,6 +112,8 @@ Current enforced checks:
 - Endnotes must rank first in comparison scorecard
 - Endnotes must lead runner-up by at least 10 percentage points in `passRate`
 
+Threshold change process is documented in [`docs/SCORECARD_GOVERNANCE.md`](docs/SCORECARD_GOVERNANCE.md).
+
 ## Artifact policy
 
 Generated report files in `evals/reports/*.json` are treated as runtime artifacts and are uploaded by CI. They are not source-of-truth files and are ignored in Git, except `evals/reports/.gitkeep`.

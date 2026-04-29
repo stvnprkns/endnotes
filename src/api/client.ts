@@ -116,6 +116,18 @@ export class EndnotesClient {
 
       this.onMetric?.({ name: "endnotes.activation.success", value: 1 })
       const payload = (await response.json()) as GenerateEndnotesResponse
+      this.onMetric?.({
+        name: payload.reliability.citationsBelowThreshold === 0 ? "endnotes.trust.publishable" : "endnotes.trust.needs_review",
+        value: 1
+      })
+      this.onMetric?.({
+        name: "endnotes.trust.citations_below_threshold",
+        value: payload.reliability.citationsBelowThreshold
+      })
+      this.onMetric?.({
+        name: "endnotes.trust.stale_citations",
+        value: payload.reliability.staleCitationCount
+      })
       const sourceById = new Map(payload.sources.map((source) => [source.id, source]))
       this.onTrace?.({
         phase: "request_succeeded",

@@ -29,30 +29,43 @@ const PROVIDERS = [
   }
 ]
 
+const externalAlternative = buildExternalAlternativeProvider()
+if (externalAlternative) {
+  PROVIDERS.push(externalAlternative)
+}
+
+for (const provider of PROVIDERS) {
+  if (!provider.getPayload) {
+    provider.getPayload = async (testCase) => provider.transformPayload(structuredClone(testCase.payload))
+  }
+}
+
 const trustCases = JSON.parse(await readFile(trustCasesPath, "utf8"))
 const providerResults = []
 
 for (const provider of PROVIDERS) {
-  const results = trustCases.map((testCase) => {
-    const payload = provider.transformPayload(structuredClone(testCase.payload))
+  const results = []
+  for (const testCase of trustCases) {
+    const payload = await provider.getPayload(testCase)
     const signalResults = evaluateSignals(payload)
     const trustDecision = evaluateTrustPolicy(payload, TRUST_POLICY)
     const expectedDecision = testCase.expectedDecision
     const decisionMatchesExpectation =
       expectedDecision === "publishable" ? trustDecision.canPublish : trustDecision.needsReview
 
-    return {
+    results.push({
       id: testCase.id,
       passed: signalResults.passed && decisionMatchesExpectation,
       passedSignals: signalResults.signals,
       trustDecision,
       decisionMatchesExpectation
-    }
-  })
+    })
+  }
 
   providerResults.push({
     providerId: provider.id,
     providerLabel: provider.label,
+    mode: provider.mode ?? "synthetic",
     totalCases: results.length,
     categories: buildCategories(results),
     passRate: rate(results.filter((item) => item.passed).length, results.length),
@@ -66,7 +79,8 @@ const ranking = providerResults
     providerLabel: provider.providerLabel,
     passRate: provider.passRate,
     publishableRate: provider.categories.trustOutcomes.publishableRate,
-    trustDecisionAccuracy: provider.categories.trustOutcomes.trustDecisionAccuracy
+    trustDecisionAccuracy: provider.categories.trustOutcomes.trustDecisionAccuracy,
+    mode: provider.mode ?? "synthetic"
   }))
   .sort((a, b) => b.passRate - a.passRate)
 
@@ -77,7 +91,7 @@ await writeFile(
       schemaVersion: "2026-04-trust-comparison-v1",
       generatedAt: new Date().toISOString(),
       notes:
-        "Synthetic trust-case comparison across named alternatives. Alternative providers are simulated profiles, not live external API measurements.",
+        "Trust-case comparison across named alternatives. Providers may be synthetic profiles or live adapters depending on runtime configuration.",
       policy: TRUST_POLICY,
       providers: providerResults,
       ranking
@@ -199,6 +213,39 @@ function degradeRagPayload(payload) {
       payload.reliability.citationsBelowThreshold + (payload.reliability.averageConfidence < 0.8 ? 1 : 0)
   }
   return payload
+}
+
+function buildExternalAlternativeProvider() {
+  const baseUrl = process.env.ENDNOTES_ALT_PROVIDER_URL
+  if (!baseUrl) {
+    return null
+  }
+  const normalizedBaseUrl = baseUrl.replace(/\/$/, "")
+  const apiKey = process.env.ENDNOTES_ALT_PROVIDER_API_KEY
+
+  return {
+    id: "external_alt_provider",
+    label: process.env.ENDNOTES_ALT_PROVIDER_LABEL ?? "External alternative provider",
+    mode: "live",
+    async getPayload(testCase) {
+      const response = await fetch(`${normalizedBaseUrl}/endnotes:generate`, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          ...(apiKey ? { authorization: `Bearer ${apiKey}` } : {})
+        },
+        body: JSON.stringify({
+          draft: testCase.payload.citations?.[0]?.claim ?? testCase.id,
+          style: "numeric",
+          outputFormat: "markdown"
+        })
+      })
+      if (!response.ok) {
+        throw new Error(`External alternative provider request failed (${response.status})`)
+      }
+      return response.json()
+    }
+  }
 }
 
 function degradeManualPayload(payload) {

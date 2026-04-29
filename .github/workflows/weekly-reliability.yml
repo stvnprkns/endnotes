@@ -1,0 +1,45 @@
+name: Weekly Reliability
+
+on:
+  schedule:
+    - cron: "0 14 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  weekly-reliability:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run reliability pipelines
+        run: npm run reliability:weekly && npm run evals:compare && npm run verify:scorecards
+
+      - name: Create pull request with weekly changelog
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: chore/weekly-reliability-update
+          title: "chore: weekly reliability update"
+          commit-message: "chore: weekly reliability update"
+          body: |
+            Automated weekly reliability update.
+
+            - runs trust evals
+            - refreshes reliability changelog
+            - verifies scorecard thresholds
+          add-paths: |
+            docs/reliability-changelog.md

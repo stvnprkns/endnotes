@@ -2,6 +2,10 @@ export type EndnotesMetricName =
   | "endnotes.activation.success"
   | "endnotes.activation.failure"
   | "endnotes.request.latency_ms"
+  | "endnotes.trust.publishable"
+  | "endnotes.trust.needs_review"
+  | "endnotes.trust.citations_below_threshold"
+  | "endnotes.trust.stale_citations"
 
 export interface EndnotesMetric {
   name: EndnotesMetricName

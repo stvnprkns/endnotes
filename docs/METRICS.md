@@ -18,6 +18,10 @@ const client = new EndnotesClient({
 - `endnotes.activation.success`
 - `endnotes.activation.failure` (includes `code` tag)
 - `endnotes.request.latency_ms`
+- `endnotes.trust.publishable`
+- `endnotes.trust.needs_review`
+- `endnotes.trust.citations_below_threshold`
+- `endnotes.trust.stale_citations`
 
 These metrics map directly to activation and reliability funnel analysis.
 
