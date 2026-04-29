@@ -30,6 +30,7 @@ Track these verification indicators in CI for citation + narrative note coverage
 - Golden recipe contains both `kind="citation"` and `kind="note"` in `examples/recipes/react-mixed-footnotes.tsx`
 - `npm run test:golden` remains green after API or UI schema changes
 - Adoption evals preserve canonical minimal note shape (`title`, `href`, optional `kind`) in generated snippets
+- Assistant fixture matrix (`evals/dataset/assistant-fixture-matrix.json`) covers factual answer, report, and recommendation prompt styles
 
 These metrics map directly to activation and reliability funnel analysis.
 

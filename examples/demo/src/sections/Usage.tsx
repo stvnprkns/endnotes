@@ -28,6 +28,19 @@ toaster.promise(saveDraft(), {
   error: "Save failed"
 })`
 
+const TRUST_GATE_SNIPPET = `const result = await client.generate({
+  draft,
+  style: "numeric",
+  outputFormat: "markdown"
+})
+
+const trust = evaluateTrustPolicy(result)
+if (!trust.canPublish) {
+  return { status: "needs_review", trust, result }
+}
+
+return { status: "publishable", trust, result }`
+
 export function Usage(): JSX.Element {
   return (
     <section className="section" id="usage" aria-labelledby="usage-title">
@@ -39,6 +52,7 @@ export function Usage(): JSX.Element {
       </p>
       <CodeBlock code={USAGE_SNIPPET} label="Minimal usage" title="Start here" language="tsx" />
       <CodeBlock code={TOASTER_SNIPPET} label="Imperative API" title="Sonner-style toasts" language="tsx" />
+      <CodeBlock code={TRUST_GATE_SNIPPET} label="Trust gate" title="Publish vs needs review" language="ts" />
       <div className="install-cta-row" style={{ maxWidth: "42rem", marginBottom: "1rem" }}>
         <button
           type="button"
@@ -98,6 +112,10 @@ export function Usage(): JSX.Element {
             >
               PLOS ONE submission guidelines
             </Note>
+          </p>
+          <p>
+            Some details are narrative annotations rather than bibliography sources.
+            <Note kind="note">Rollout timing note: support playbooks were finalized one sprint later.</Note>
           </p>
           <Endnotes title="Footnotes & References" />
         </EndnotesProvider>

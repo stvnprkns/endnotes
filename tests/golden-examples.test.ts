@@ -15,12 +15,19 @@ describe("golden examples", () => {
       resolve(process.cwd(), "examples/recipes/react-mixed-footnotes.tsx"),
       "utf8"
     )
+    const mdxBlog = readFileSync(resolve(process.cwd(), "examples/recipes/mdx-blog-post.mdx"), "utf8")
+    const docsLayout = readFileSync(
+      resolve(process.cwd(), "examples/recipes/docs-site-layout.tsx"),
+      "utf8"
+    )
 
     expect(nextjs).toContain("EndnotesClient")
     expect(fastapi).toContain("EndnotesClient")
     expect(staticSite).toContain("outputFormat")
     expect(mixedFootnotes).toContain('kind="citation"')
     expect(mixedFootnotes).toContain('kind="note"')
+    expect(mdxBlog).toContain("<Endnotes />")
+    expect(docsLayout).toContain("EndnotesProvider")
   })
 
   it("runs nextjs API recipe end-to-end", async () => {

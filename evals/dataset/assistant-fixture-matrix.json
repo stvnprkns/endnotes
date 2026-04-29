@@ -1,0 +1,32 @@
+[
+  {
+    "id": "factual-answer",
+    "promptStyle": "factual_answer",
+    "draft": "Team velocity improved after adding citation trails.",
+    "expected": {
+      "requiresCitation": true,
+      "minimalFields": ["title", "href"],
+      "allowedKinds": ["citation", "note"]
+    }
+  },
+  {
+    "id": "structured-report",
+    "promptStyle": "report",
+    "draft": "Quarterly report summary with evidence-backed claims.",
+    "expected": {
+      "requiresCitation": true,
+      "minimalFields": ["title", "href"],
+      "allowedKinds": ["citation", "note"]
+    }
+  },
+  {
+    "id": "recommendation-brief",
+    "promptStyle": "recommendation",
+    "draft": "Recommend rollout sequencing and include source-backed rationale.",
+    "expected": {
+      "requiresCitation": true,
+      "minimalFields": ["title", "href"],
+      "allowedKinds": ["citation", "note"]
+    }
+  }
+]

@@ -1,0 +1,17 @@
+import { Endnotes, Note } from "../../src"
+
+# Building Trust in AI UIs
+
+Teams trust generated answers more when supporting references are visible near each claim.
+<Note kind="citation" href="https://example.com/research" type="paper">
+  Source Trails in AI Products
+</Note>
+
+Narrative details can stay as notes without pretending to be bibliographic citations.
+<Note kind="note">This rollout was delayed by one sprint for support training.</Note>
+
+## Why this works
+
+`<Note />` stays inline with prose while `<Endnotes />` renders once at the template end.
+
+<Endnotes />

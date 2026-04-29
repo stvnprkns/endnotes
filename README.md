@@ -262,6 +262,8 @@ ENDNOTES_API_BASE_URL=http://localhost:8787/v1 npm run evals
 - MCP tool definition: [`docs/tooling/mcp-endnotes-tool.json`](docs/tooling/mcp-endnotes-tool.json)
 - Prompt snippets for assistants: [`docs/tooling/prompt-snippets.md`](docs/tooling/prompt-snippets.md)
 - LLM-safe minimal schema guidance: [`docs/AI_QUICKSTART.md`](docs/AI_QUICKSTART.md)
+- Integration chooser: [`docs/INTEGRATION_CHOOSER.md`](docs/INTEGRATION_CHOOSER.md)
+- Launch bundle checklist: [`docs/LAUNCH_BUNDLE.md`](docs/LAUNCH_BUNDLE.md)
 - Golden examples pack: [`examples/golden/README.md`](examples/golden/README.md)
 - Golden examples verification: [`tests/golden-examples.test.ts`](tests/golden-examples.test.ts)
 - CI workflow with golden checks: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)

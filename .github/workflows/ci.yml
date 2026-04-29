@@ -34,6 +34,12 @@ jobs:
       - name: Golden examples verification
         run: npm run test:golden --if-present
 
+      - name: Contract conformance verification
+        run: npm run test:contracts --if-present
+
+      - name: Assistant fixture matrix verification
+        run: npm run test:fixtures --if-present
+
       - name: Trust eval gate (synthetic fixtures)
         run: npm run evals --if-present
 
@@ -67,6 +73,7 @@ jobs:
             evals/reports/latest.json
             evals/reports/public-scorecard.json
             evals/reports/public-comparison-scorecard.json
+            docs/reliability-changelog.md
 
   auth-lifecycle:
     runs-on: ubuntu-latest

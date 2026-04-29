@@ -29,6 +29,8 @@
     "build:demo": "vite build --config examples/demo/vite.config.ts",
     "test": "vitest run",
     "test:golden": "vitest run tests/golden-examples.test.ts",
+    "test:contracts": "vitest run tests/contract-conformance.test.ts",
+    "test:fixtures": "vitest run tests/assistant-fixture-matrix.test.ts",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
     "evals": "node evals/run-evals.mjs",

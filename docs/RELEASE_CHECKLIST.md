@@ -18,6 +18,10 @@ npm install
 npm run build
 npm run typecheck
 npm test
+npm run test:contracts
+npm run test:fixtures
+npm run test:golden
+npm run verify:scorecards
 npm run build:demo
 npm run verify:package
 npm run smoke
@@ -84,6 +88,8 @@ import "endnotes/style.css"
   - Fixed
   - Breaking changes (if any)
 - Include migration notes if API or defaults changed.
+- Complete go/no-go checklist in `docs/GO_NO_GO_30_DAY_SCORECARD.md`.
+- Record final decision in `docs/RELEASE_DECISION_RECORD.md`.
 
 ## 6) Publish
 
