@@ -333,12 +333,13 @@ body {
 
 /* Light inset: keep readable chrome in both demo themes. */
 .code-block-panel {
-  --code-block-fg: #111827;
-  --code-block-muted: #6b7280;
-  --code-block-title: #374151;
-  --code-block-toolbar-bg: #f3f4f6;
-  --code-block-body-bg: #f9fafb;
-  --code-block-border: #e5e7eb;
+  --code-block-fg: var(--foreground);
+  --code-block-muted: var(--muted-foreground);
+  --code-block-title: color-mix(in oklab, var(--foreground) 88%, var(--muted-foreground));
+  --code-block-toolbar-bg: color-mix(in oklab, var(--surface) 92%, var(--foreground) 4%);
+  --code-block-body-bg: color-mix(in oklab, var(--surface) 96%, var(--background));
+  --code-block-border: color-mix(in oklab, var(--border) 88%, var(--foreground) 6%);
+  --code-block-hover: color-mix(in oklab, var(--foreground) 9%, transparent);
   --code-block-code-line-height: 1.28;
 
   min-width: 0;
@@ -410,12 +411,12 @@ body {
 
 .code-block-copy:hover {
   color: var(--code-block-fg);
-  background: rgba(17, 24, 39, 0.06);
+  background: var(--code-block-hover);
 }
 
 .code-block-copy:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 2px var(--code-block-toolbar-bg), 0 0 0 4px #2563eb;
+  box-shadow: 0 0 0 2px var(--code-block-toolbar-bg), 0 0 0 4px var(--focus);
 }
 
 .code-block-pre {

@@ -10,6 +10,8 @@ export type EndnoteSourceType =
   | "internal"
   | "other"
 
+export type EndnoteKind = "citation" | "note"
+
 export type EndnoteSource = {
   id?: string
   href?: string
@@ -22,6 +24,7 @@ export type EndnoteSource = {
   supports?: string
   description?: string
   type?: EndnoteSourceType
+  kind?: EndnoteKind
 }
 
 export type EndnoteTheme = {

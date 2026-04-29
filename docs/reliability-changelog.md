@@ -34,3 +34,25 @@ Generated with `npm run reliability:weekly`.
 - Trust decision accuracy: `100.0%` (delta: 0.0%)
 
 ---
+
+## 2026-04-29
+
+- Schema version: `2026-04-trust-mvp`
+- Total cases: `4`
+- Pass rate: `100.0%` (delta: 0.0%)
+- Publishable rate: `25.0%` (delta: -32.1%)
+- Manual review rate: `75.0%` (delta: +32.1%)
+- Trust decision accuracy: `100.0%` (delta: 0.0%)
+
+---
+
+## 2026-04-29
+
+- Schema version: `2026-04-trust-mvp`
+- Total cases: `4`
+- Pass rate: `100.0%` (delta: 0.0%)
+- Publishable rate: `25.0%` (delta: 0.0%)
+- Manual review rate: `75.0%` (delta: 0.0%)
+- Trust decision accuracy: `100.0%` (delta: 0.0%)
+
+---

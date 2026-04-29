@@ -1,6 +1,17 @@
 {
   "name": "generate_endnotes",
   "description": "Generate validated endnotes for AI-generated text in one call.",
+  "x-llmOutputGuidance": {
+    "minimalUiNoteSchema": {
+      "title": "Source title",
+      "href": "https://example.com/source",
+      "kind": "citation"
+    },
+    "kindDefaults": {
+      "citation": "Use for bibliography/source references.",
+      "note": "Use for narrative footnotes without bibliographic metadata."
+    }
+  },
   "inputSchema": {
     "type": "object",
     "required": ["draft"],

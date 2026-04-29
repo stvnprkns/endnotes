@@ -39,6 +39,10 @@ function normalizeTitle(title?: string, children?: ReactNode): string | undefine
   return undefined
 }
 
+type PreviewPhase = "entering" | "open" | "exiting"
+
+const PREVIEW_EXIT_MS = 170
+
 export function Note({
   children,
   title,
@@ -50,16 +54,53 @@ export function Note({
   const context = explicitContext ?? implicitContext
   const reactId = useId()
   const [registration, setRegistration] = useState<{ sourceKey: string; number: number } | null>(null)
-  const [isPreviewVisible, setIsPreviewVisible] = useState(false)
+  const [isPreviewMounted, setIsPreviewMounted] = useState(false)
+  const [previewPhase, setPreviewPhase] = useState<PreviewPhase>("exiting")
   const [touchPreviewMode, setTouchPreviewMode] = useState(false)
   const markerRootRef = useRef<HTMLElement>(null)
+  const previewEnterRafRef = useRef<number | null>(null)
+  const previewCloseTimerRef = useRef<number | null>(null)
   const { registerSource, unregisterSourceInstance, markerIdFor, scrollToNote } = context
 
   const instanceId = useMemo(() => reactId.replace(/:/g, ""), [reactId])
   const resolvedTitle = normalizeTitle(title, children)
 
-  const openPreview = () => setIsPreviewVisible(true)
-  const closePreview = () => setIsPreviewVisible(false)
+  const clearPreviewTimers = () => {
+    if (previewEnterRafRef.current !== null) {
+      window.cancelAnimationFrame(previewEnterRafRef.current)
+      previewEnterRafRef.current = null
+    }
+    if (previewCloseTimerRef.current !== null) {
+      window.clearTimeout(previewCloseTimerRef.current)
+      previewCloseTimerRef.current = null
+    }
+  }
+
+  const openPreview = () => {
+    clearPreviewTimers()
+    if (!isPreviewMounted) {
+      setIsPreviewMounted(true)
+      setPreviewPhase("entering")
+      previewEnterRafRef.current = window.requestAnimationFrame(() => {
+        setPreviewPhase("open")
+        previewEnterRafRef.current = null
+      })
+      return
+    }
+    setPreviewPhase("open")
+  }
+
+  const closePreview = () => {
+    clearPreviewTimers()
+    if (!isPreviewMounted) {
+      return
+    }
+    setPreviewPhase("exiting")
+    previewCloseTimerRef.current = window.setTimeout(() => {
+      setIsPreviewMounted(false)
+      previewCloseTimerRef.current = null
+    }, PREVIEW_EXIT_MS)
+  }
 
   useEffect(() => {
     if (!source.id && !source.href && !resolvedTitle && !source.source) {
@@ -89,6 +130,7 @@ export function Note({
     source.href,
     source.id,
     source.quote,
+    source.kind,
     source.source,
     source.supports,
     source.type,
@@ -109,14 +151,20 @@ export function Note({
       if (next && root.contains(next)) {
         return
       }
-      setIsPreviewVisible(false)
+      closePreview()
     }
 
     root.addEventListener("focusout", onFocusOut)
     return () => {
       root.removeEventListener("focusout", onFocusOut)
     }
-  }, [touchPreviewMode, registration?.sourceKey ?? null])
+  }, [touchPreviewMode, registration?.sourceKey ?? null, isPreviewMounted])
+
+  useEffect(() => {
+    return () => {
+      clearPreviewTimers()
+    }
+  }, [])
 
   if (!registration) {
     return (
@@ -150,7 +198,11 @@ export function Note({
   const handleMarkerClick = (event: MouseEvent<HTMLAnchorElement>) => {
     if (touchPreviewMode) {
       event.preventDefault()
-      setIsPreviewVisible((current) => !current)
+      if (isPreviewMounted && previewPhase !== "exiting") {
+        closePreview()
+      } else {
+        openPreview()
+      }
       return
     }
     event.preventDefault()
@@ -186,7 +238,7 @@ export function Note({
             context.activeMarkerInstanceId === instanceId ? "is-active" : undefined
           )}
           aria-label={formatMarkerLabel(number, resolvedTitle)}
-          aria-describedby={isPreviewVisible ? previewId : undefined}
+          aria-describedby={isPreviewMounted && previewPhase !== "exiting" ? previewId : undefined}
           onPointerDown={(event) => {
             if (event.pointerType === "touch") {
               setTouchPreviewMode(true)
@@ -205,8 +257,19 @@ export function Note({
           {number}
         </a>
       </sup>
-      {isPreviewVisible ? (
-        <span id={previewId} role="region" aria-label={previewRegionLabel} className="endnotes-preview-card">
+      {isPreviewMounted ? (
+        <span
+          id={previewId}
+          role={previewPhase === "exiting" ? undefined : "region"}
+          aria-label={previewPhase === "exiting" ? undefined : previewRegionLabel}
+          aria-hidden={previewPhase === "exiting" ? "true" : undefined}
+          className={joinClassNames(
+            "endnotes-preview-card",
+            previewPhase === "entering" ? "is-entering" : undefined,
+            previewPhase === "open" ? "is-open" : undefined,
+            previewPhase === "exiting" ? "is-exiting" : undefined
+          )}
+        >
           <span className="endnotes-preview-title">{previewTitle}</span>
           {previewMeta ? <span className="endnotes-preview-meta">{previewMeta}</span> : null}
           {registeredSource?.quote ? <span className="endnotes-preview-quote">"{registeredSource.quote}"</span> : null}

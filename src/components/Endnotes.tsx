@@ -2,6 +2,7 @@ import type { JSX } from "react"
 import { useEndnotesContextOptional } from "../context/EndnotesContext"
 import type { EndnotesProps, RegisteredEndnote } from "../types/endnotes"
 import { useImplicitEndnotesContext } from "../context/implicitStore"
+import { inferEndnoteKind } from "../core/sourceKind"
 
 const SAFE_HREF_PROTOCOLS = new Set(["http:", "https:", "mailto:", "tel:"])
 
@@ -40,7 +41,11 @@ function metadata(note: RegisteredEndnote): string {
 }
 
 function supportingSentence(note: RegisteredEndnote): string | null {
-  return note.source.description ?? note.source.supports ?? note.source.quote ?? note.source.source ?? metadata(note) ?? null
+  const kind = inferEndnoteKind(note.source)
+  if (kind === "citation") {
+    return note.source.source ?? metadata(note) ?? note.source.description ?? note.source.supports ?? note.source.quote ?? null
+  }
+  return note.source.description ?? note.source.supports ?? note.source.quote ?? metadata(note) ?? null
 }
 
 export function Endnotes({ title, heading, className }: EndnotesProps): JSX.Element | null {
@@ -68,8 +73,9 @@ export function Endnotes({ title, heading, className }: EndnotesProps): JSX.Elem
       </div>
       <ol className="endnotes-list">
         {context.notes.map((note) => {
+          const kind = inferEndnoteKind(note.source)
           const sanitizedHref = sanitizeHref(note.source.href)
-          const titleText = note.source.title ?? note.source.href ?? "Untitled source"
+          const titleText = note.source.title ?? note.source.href ?? (kind === "note" ? "Note" : "Untitled source")
           const sentence = supportingSentence(note)
           return (
             <li
@@ -79,8 +85,10 @@ export function Endnotes({ title, heading, className }: EndnotesProps): JSX.Elem
               tabIndex={-1}
               className={joinClassNames(
                 "endnotes-item",
+                `endnotes-item--${kind}`,
                 context.activeNoteKey === note.key ? "is-active" : undefined
               )}
+              data-endnote-kind={kind}
             >
               <p className="endnotes-footnote-p">
                 {sanitizedHref ? (

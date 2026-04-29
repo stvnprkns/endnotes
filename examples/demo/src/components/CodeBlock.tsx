@@ -13,8 +13,26 @@ type CodeBlockProps = {
 export function CodeBlock({ code, label, title, language, children }: CodeBlockProps): JSX.Element {
   const [copied, setCopied] = useState(false)
   const [highlightedHtml, setHighlightedHtml] = useState<string | null>(null)
+  const [appearance, setAppearance] = useState<"light" | "dark">("light")
   const headingId = useId()
   const hasToolbarHeading = !!(label || title || language)
+
+  useEffect(() => {
+    if (typeof document === "undefined") return
+
+    const root = document.querySelector(".demo-root")
+    if (!root) return
+
+    const syncAppearance = () => {
+      setAppearance(root.classList.contains("dark") ? "dark" : "light")
+    }
+
+    syncAppearance()
+    const observer = new MutationObserver(syncAppearance)
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] })
+
+    return () => observer.disconnect()
+  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -22,7 +40,7 @@ export function CodeBlock({ code, label, title, language, children }: CodeBlockP
     ;(async () => {
       try {
         const { highlightToHtml } = await import("../lib/highlightCode")
-        const html = await highlightToHtml(code, language)
+        const html = await highlightToHtml(code, language, appearance)
         if (!cancelled) setHighlightedHtml(html)
       } catch {
         if (!cancelled) setHighlightedHtml(null)
@@ -31,7 +49,7 @@ export function CodeBlock({ code, label, title, language, children }: CodeBlockP
     return () => {
       cancelled = true
     }
-  }, [code, language])
+  }, [code, language, appearance])
 
   const copy = useCallback(async () => {
     const done = () => {

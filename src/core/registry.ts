@@ -2,6 +2,7 @@ import { resolveSourceKey } from "./identity"
 import { sortRegisteredEndnotes } from "./sorting"
 import type { EndnoteSource, RegisteredEndnote } from "../types/endnotes"
 import { warnOnce } from "./warnings"
+import { inferEndnoteKind } from "./sourceKind"
 
 export type RegisterSourceInput = {
   source: EndnoteSource
@@ -35,7 +36,11 @@ export class EndnotesRegistry {
   private notesByKey = new Map<string, RegisteredEndnote>()
 
   register({ source, instanceId }: RegisterSourceInput): RegisteredEndnote {
-    const key = resolveSourceKey(source)
+    const normalizedSource = {
+      ...source,
+      kind: inferEndnoteKind(source)
+    }
+    const key = resolveSourceKey(normalizedSource)
     const existing = this.notesByKey.get(key)
 
     if (existing) {
@@ -47,7 +52,7 @@ export class EndnotesRegistry {
         existing.instances.push({ instanceId, sourceKey: key })
       }
 
-      existing.source = mergeSourceMetadata(existing.source, source, key)
+      existing.source = mergeSourceMetadata(existing.source, normalizedSource, key)
       return existing
     }
 
@@ -55,7 +60,7 @@ export class EndnotesRegistry {
     const created: RegisteredEndnote = {
       key,
       number,
-      source,
+      source: normalizedSource,
       instances: [{ instanceId, sourceKey: key }]
     }
 

@@ -29,10 +29,14 @@ export function resolveShikiLang(language: string | undefined): BundledLanguage 
   return LANG_ALIASES[key] ?? "tsx"
 }
 
-export async function highlightToHtml(code: string, language: string | undefined): Promise<string> {
+export async function highlightToHtml(
+  code: string,
+  language: string | undefined,
+  appearance: "light" | "dark" = "light"
+): Promise<string> {
   const lang = resolveShikiLang(language)
   return codeToHtml(code, {
     lang,
-    theme: "github-light",
+    theme: appearance === "dark" ? "github-dark" : "github-light",
   })
 }

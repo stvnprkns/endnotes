@@ -23,6 +23,14 @@ const client = new EndnotesClient({
 - `endnotes.trust.citations_below_threshold`
 - `endnotes.trust.stale_citations`
 
+## Mixed footnote reliability checks
+
+Track these verification indicators in CI for citation + narrative note coverage:
+
+- Golden recipe contains both `kind="citation"` and `kind="note"` in `examples/recipes/react-mixed-footnotes.tsx`
+- `npm run test:golden` remains green after API or UI schema changes
+- Adoption evals preserve canonical minimal note shape (`title`, `href`, optional `kind`) in generated snippets
+
 These metrics map directly to activation and reliability funnel analysis.
 
 ## Dev API usage report

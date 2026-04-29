@@ -11,10 +11,16 @@ describe("golden examples", () => {
       resolve(process.cwd(), "examples/recipes/static-markdown-build.mjs"),
       "utf8"
     )
+    const mixedFootnotes = readFileSync(
+      resolve(process.cwd(), "examples/recipes/react-mixed-footnotes.tsx"),
+      "utf8"
+    )
 
     expect(nextjs).toContain("EndnotesClient")
     expect(fastapi).toContain("EndnotesClient")
     expect(staticSite).toContain("outputFormat")
+    expect(mixedFootnotes).toContain('kind="citation"')
+    expect(mixedFootnotes).toContain('kind="note"')
   })
 
   it("runs nextjs API recipe end-to-end", async () => {

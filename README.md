@@ -89,6 +89,12 @@ export function Article() {
 }
 ```
 
+### 60-second framework starts
+
+- React app: use `<Note />` inline and render one `<Endnotes />` near article end.
+- MDX blog: map markdown references to `<Note />` and keep `<Endnotes />` in post layout.
+- Docs site: add `<EndnotesProvider>` at docs root and call `<Note />` from MDX components.
+
 ## Promise toasts
 
 ```tsx
@@ -120,6 +126,35 @@ Repeated sources dedupe automatically:
 <Note href="https://example.com/report">Trust Report</Note>
 ```
 
+## Citation and note kinds
+
+Use one API for both bibliography-style sources and narrative footnotes.
+
+```tsx
+<p>
+  The benchmark improved by 17%.
+  <Note
+    kind="citation"
+    href="https://example.com/benchmarks"
+    type="report"
+    source="Engineering Report"
+    date="2026"
+  >
+    Performance Report
+  </Note>
+</p>
+
+<p>
+  The migration took two weeks.
+  <Note kind="note">Timeline based on internal team logs.</Note>
+</p>
+```
+
+Default inference is non-breaking:
+
+- If `href` or `type` exists, Endnotes treats the item as a `citation`
+- If bibliographic fields are missing, Endnotes treats the item as a narrative `note`
+
 ## Toast actions and positioning
 
 ```tsx
@@ -130,6 +165,22 @@ toaster("Item archived", {
   cancel: { label: "Dismiss", onClick: () => {} }
 })
 ```
+
+## Migrate from manual superscript links
+
+Replace this:
+
+```html
+Claim text<sup><a href="#fn1">1</a></sup>
+```
+
+With this:
+
+```tsx
+Claim text<Note href="https://example.com/source">Source title</Note>
+```
+
+Then render `<Endnotes />` once at the end of the article/template.
 
 ## Styling
 
@@ -210,6 +261,7 @@ ENDNOTES_API_BASE_URL=http://localhost:8787/v1 npm run evals
 - OpenAPI tool-calling spec: [`docs/openapi/endnotes.v1.yaml`](docs/openapi/endnotes.v1.yaml)
 - MCP tool definition: [`docs/tooling/mcp-endnotes-tool.json`](docs/tooling/mcp-endnotes-tool.json)
 - Prompt snippets for assistants: [`docs/tooling/prompt-snippets.md`](docs/tooling/prompt-snippets.md)
+- LLM-safe minimal schema guidance: [`docs/AI_QUICKSTART.md`](docs/AI_QUICKSTART.md)
 - Golden examples pack: [`examples/golden/README.md`](examples/golden/README.md)
 - Golden examples verification: [`tests/golden-examples.test.ts`](tests/golden-examples.test.ts)
 - CI workflow with golden checks: [`.github/workflows/ci.yml`](.github/workflows/ci.yml)

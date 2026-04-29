@@ -3,6 +3,14 @@ info:
   title: Endnotes API
   version: 1.0.0
   description: One-call API to generate trustworthy endnotes for AI content.
+  x-llmOutputGuidance:
+    minimalUiNoteSchema:
+      title: Source title
+      href: https://example.com/source
+      kind: citation
+    kindDefaults:
+      citation: Use for bibliography/source references.
+      note: Use for narrative footnotes without bibliographic metadata.
 servers:
   - url: https://api.endnotes.ai
 paths:
@@ -46,6 +54,10 @@ components:
     GenerateEndnotesRequest:
       type: object
       required: [draft]
+      description: |
+        Minimal stable request includes `draft` only.
+        For UI note object generation in downstream tooling, use this canonical minimal shape first:
+        `{ "title": "...", "href": "...", "kind": "citation" }`.
       properties:
         draft:
           type: string

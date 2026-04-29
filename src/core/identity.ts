@@ -27,6 +27,7 @@ function hashString(input: string): string {
 
 function fallbackIdentityFields(source: EndnoteSource): string[] {
   return [
+    source.kind ?? "",
     source.title ?? "",
     source.source ?? "",
     source.date ?? "",

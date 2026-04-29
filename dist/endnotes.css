@@ -2,7 +2,7 @@
 
 .endnotes-root {
   /* Default body copy for markers, preview, list, and footnotes when the host omits theme tokens */
-  --endnotes-text-body: rgba(114, 119, 122, 1);
+  --endnotes-text-body: var(--endnotes-citation, rgba(114, 119, 122, 1));
   --endnotes-font-family: var(
     --font-sans,
     "Inter",
@@ -25,15 +25,21 @@
   --endnotes-radius: var(--radius, 0.625rem);
   /* Matt light theme fallbacks when host does not set --c--theme-* */
   --endnotes-matt-secondary: var(--c--theme-text-secondary, var(--endnotes-text-body));
-  --endnotes-matt-link: var(--c--theme-text-link, #5763ff);
-  --endnotes-matt-heading: var(--c--gray-900, #242627);
-  --endnotes-matt-rule: var(--c--gray-50, #ededed);
+  --endnotes-matt-link: var(--endnotes-link, var(--c--theme-text-link, #5763ff));
+  --endnotes-matt-heading: var(--endnotes-heading-color, var(--c--gray-900, #242627));
+  --endnotes-matt-rule: var(--endnotes-rule, var(--c--gray-50, #ededed));
   --endnotes-matt-target-bg: var(--c--yellow-25, #fbf8ce);
   --endnotes-matt-radius-s: var(--l--border-radius-s, 0.25rem);
+  --endnotes-link-idle: var(
+    --endnotes-citation,
+    var(--muted-foreground, color-mix(in oklab, var(--endnotes-foreground) 72%, var(--endnotes-background) 28%))
+  );
+  --endnotes-link-interactive: var(--endnotes-link-hover, var(--endnotes-link, var(--endnotes-accent)));
+  --endnotes-copy-color: var(--endnotes-link-idle);
   --endnotes-space-l: var(--l--space-l, 5rem);
   --endnotes-space-m: var(--l--space-m, 2.25rem);
   --endnotes-space-xs: var(--l--space-xs, 0.5rem);
-  --endnotes-type-s: var(--t--size-s, clamp(0.85rem, 2vw, 0.9rem));
+  --endnotes-type-s: var(--t--size-s, 1em);
   --endnotes-leading-tight: var(--t--leading-tight, clamp(1.2em, calc(26px - 1vw), 1.3em));
   --endnotes-weight-medium: var(--t--weight-medium, 500);
   --endnotes-family-sans: var(--t--family-sans, var(--endnotes-font-family));
@@ -49,8 +55,7 @@
   --endnotes-preview-duration: 0.26s;
   --endnotes-preview-ease: cubic-bezier(0.22, 1.28, 0.36, 1);
   --endnotes-preview-font-size: 0.8125rem;
-  /* Do not set --endnotes-citation or --endnotes-link here so host (.demo-root, etc.) can override. */
-  --endnotes-heading-color: var(--endnotes-matt-heading);
+  /* Do not set --endnotes-citation, --endnotes-link, --endnotes-heading-color here so host can override. */
 
   color: var(--endnotes-foreground);
   font-family: var(--endnotes-font-family);
@@ -137,12 +142,6 @@
   }
 }
 
-@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .endnotes-marker-link:hover {
-    transform: scale(1.05);
-  }
-}
-
 .endnotes-marker-link.is-active {
   color: inherit;
   background-color: var(--endnotes-marker-highlight);
@@ -176,7 +175,7 @@
 /* --- Footnotes block (Matt: .footnotes) --- */
 
 .endnotes-section {
-  color: var(--endnotes-citation, var(--endnotes-matt-secondary, var(--endnotes-text-body)));
+  color: var(--endnotes-copy-color);
   margin-top: var(--endnotes-space-l);
   border-top: 0;
   padding-top: 0;
@@ -215,7 +214,7 @@
   font-family: var(--endnotes-family-sans);
   font-size: var(--endnotes-type-s);
   line-height: var(--endnotes-leading-tight);
-  color: var(--endnotes-citation, var(--endnotes-matt-secondary, var(--endnotes-text-body)));
+  color: var(--endnotes-copy-color);
 }
 
 .endnotes-item {
@@ -239,12 +238,12 @@
   box-shadow: 0 0 0 2px var(--endnotes-background), 0 0 0 4px var(--endnotes-focus);
 }
 
-.endnotes-footnote-p {
+.endnotes-section .endnotes-footnote-p {
   margin: 0;
   font-family: inherit;
   font-size: inherit;
   line-height: inherit;
-  color: var(--endnotes-text-body);
+  color: var(--endnotes-copy-color);
 }
 
 .endnotes-section a {
@@ -262,25 +261,25 @@
 }
 
 .endnotes-title-link {
-  color: var(--endnotes-text-body);
+  color: var(--endnotes-link-idle);
   text-decoration: none;
   transition: color var(--endnotes-motion-duration) var(--endnotes-motion-ease);
 }
 
 .endnotes-title-link:visited {
-  color: var(--endnotes-text-body);
+  color: var(--endnotes-link-idle);
 }
 
 .endnotes-title-link:hover,
 .endnotes-title-link:focus-visible {
-  color: var(--endnotes-text-body);
+  color: var(--endnotes-link-interactive);
   text-decoration: underline;
 }
 
-.endnotes-sentence {
+.endnotes-section .endnotes-sentence {
   font-size: inherit;
   line-height: inherit;
-  color: inherit;
+  color: var(--endnotes-copy-color);
 }
 
 .endnotes-section .endnotes-links {
@@ -290,7 +289,7 @@
 }
 
 .endnotes-backref {
-  color: var(--endnotes-text-body);
+  color: var(--endnotes-link-idle);
   margin: 0 0.1rem;
   text-decoration: none;
   font: inherit;
@@ -300,7 +299,7 @@
 
 .endnotes-backref:hover,
 .endnotes-backref:focus-visible {
-  color: var(--endnotes-text-body);
+  color: var(--endnotes-link-interactive);
   text-decoration: underline;
 }
 
@@ -331,18 +330,6 @@
   }
 }
 
-@keyframes endnotes-preview-pop {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(8px) scale(0.92);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0) scale(1);
-  }
-}
-
 .endnotes-preview-card {
   position: absolute;
   left: 50%;
@@ -368,9 +355,22 @@
   font-synthesis: weight style;
   white-space: normal;
   transform-origin: center top;
-  transform: translateX(-50%) translateY(0) scale(1);
+  transform: translateX(-50%) translateY(6px) scale(0.98);
+  opacity: 0;
+  transition:
+    opacity var(--endnotes-preview-duration) var(--endnotes-preview-ease),
+    transform var(--endnotes-preview-duration) var(--endnotes-preview-ease);
+}
+
+.endnotes-preview-card.is-entering,
+.endnotes-preview-card.is-open {
   opacity: 1;
-  animation: endnotes-preview-pop var(--endnotes-preview-duration) var(--endnotes-preview-ease) both;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.endnotes-preview-card.is-exiting {
+  opacity: 0;
+  transform: translateX(-50%) translateY(6px) scale(0.98);
 }
 
 .endnotes-preview-card::before {
@@ -403,7 +403,7 @@ a.endnotes-preview-href {
 }
 
 a.endnotes-preview-href:hover {
-  color: var(--endnotes-text-body);
+  color: var(--endnotes-link-interactive);
   text-decoration: underline;
 }
 
@@ -414,7 +414,14 @@ a.endnotes-preview-href:hover {
 
 @media (prefers-reduced-motion: reduce) {
   .endnotes-preview-card {
-    animation: none;
+    transform: translateX(-50%);
+    transition-duration: 0.01ms;
+  }
+
+  .endnotes-preview-card.is-entering,
+  .endnotes-preview-card.is-open,
+  .endnotes-preview-card.is-exiting {
+    transform: translateX(-50%);
   }
 }
 

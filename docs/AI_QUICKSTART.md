@@ -52,6 +52,35 @@ Generate article first, then call Endnotes with `outputFormat: "markdown"` and p
 
 For each assistant answer, call Endnotes and stream back `renderedText` plus a compact list of `sources`.
 
+## LLM-safe minimal schema
+
+When generating UI-facing notes, emit the smallest stable shape first:
+
+```json
+{
+  "title": "Primary source title",
+  "href": "https://example.com/source",
+  "kind": "citation"
+}
+```
+
+Use this field priority:
+
+1. Required-first: `title`, `href` (for sources) or `title` (for narrative notes)
+2. Optional semantic: `kind` (`citation` or `note`)
+3. Enrichment: `author`, `date`, `source`, `quote`, `description`, `supports`, `type`
+
+Inference defaults for generated UI payloads are non-breaking:
+
+- `href` or `type` present -> treat as `citation`
+- no bibliographic metadata -> treat as narrative `note`
+
+## 60-second framework snippets
+
+- React app: inline `<Note />` in prose, render one `<Endnotes />` near content end.
+- MDX blog: convert markdown references into `<Note />` via MDX components.
+- Docs site: wrap docs shell with `<EndnotesProvider>`, render `<Endnotes />` in page template.
+
 ## Error handling decision tree
 
 - `retryable: true` -> retry with exponential backoff (max 3)
