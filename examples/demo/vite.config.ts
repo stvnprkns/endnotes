@@ -8,6 +8,10 @@ const demoDir = dirname(fileURLToPath(import.meta.url))
 export default defineConfig({
   root: resolve(demoDir),
   plugins: [react()],
+  build: {
+    outDir: resolve(demoDir, "dist"),
+    emptyOutDir: true
+  },
   resolve: {
     alias: [
       { find: "endnotes/style.css", replacement: resolve(demoDir, "../../src/styles/endnotes.css") },

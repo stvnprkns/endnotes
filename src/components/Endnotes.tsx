@@ -45,7 +45,10 @@ function supportingSentence(note: RegisteredEndnote): string | null {
   if (kind === "citation") {
     return note.source.source ?? metadata(note) ?? note.source.description ?? note.source.supports ?? note.source.quote ?? null
   }
-  return note.source.description ?? note.source.supports ?? note.source.quote ?? metadata(note) ?? null
+  const attribution = [note.source.source, note.source.author, note.source.date, note.source.accessed]
+    .filter(Boolean)
+    .join(" • ")
+  return attribution || note.source.description || note.source.supports || note.source.quote || null
 }
 
 export function Endnotes({ title, heading, className }: EndnotesProps): JSX.Element | null {

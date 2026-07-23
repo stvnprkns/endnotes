@@ -148,7 +148,7 @@ describe("Endnotes rendering", () => {
       </>
     )
 
-    expect(await screen.findByText("Untitled source")).toBeInTheDocument()
+    expect(await screen.findByText("Note")).toBeInTheDocument()
   })
 
   it("renders internal note metadata without href", async () => {
@@ -165,7 +165,7 @@ describe("Endnotes rendering", () => {
     )
 
     expect(await screen.findByText("Design review notes")).toBeInTheDocument()
-    expect(screen.getByText("Internal memo")).toBeInTheDocument()
+    expect(screen.getByText(/Internal memo/)).toBeInTheDocument()
   })
 
   it("shows and hides marker preview on hover", async () => {
@@ -331,7 +331,7 @@ describe("Endnotes rendering", () => {
     )
 
     expect(await screen.findByText(/very long report title/i)).toBeInTheDocument()
-    expect(screen.getByText(/very long description content/i)).toBeInTheDocument()
+    expect(screen.getByText(/Longform Source Team/i)).toBeInTheDocument()
   })
 
   it("renders long URL sources without layout-breaking fallback", async () => {
