@@ -25,6 +25,7 @@
   "scripts": {
     "build": "tsup src/index.ts --format esm,cjs --dts --sourcemap --clean && cp src/styles/endnotes.css dist/endnotes.css",
     "demo": "vite --config examples/demo/vite.config.ts",
+    "site": "vite --config site/vite.config.ts",
     "dev": "vite --config examples/demo/vite.config.ts",
     "build:demo": "vite build --config examples/demo/vite.config.ts",
     "test": "vitest run",
