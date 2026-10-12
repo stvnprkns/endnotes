@@ -764,7 +764,8 @@ function supportingSentence(note) {
   if (kind === "citation") {
     return note.source.source ?? metadata(note) ?? note.source.description ?? note.source.supports ?? note.source.quote ?? null;
   }
-  return note.source.description ?? note.source.supports ?? note.source.quote ?? metadata(note) ?? null;
+  const attribution = [note.source.source, note.source.author, note.source.date, note.source.accessed].filter(Boolean).join(" \u2022 ");
+  return attribution || note.source.description || note.source.supports || note.source.quote || null;
 }
 function Endnotes({ title, heading, className }) {
   const explicitContext = useEndnotesContextOptional();

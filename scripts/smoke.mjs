@@ -1,4 +1,4 @@
-import { mkdir, readdir, rm } from "node:fs/promises"
+import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises"
 import { join, resolve } from "node:path"
 import { spawn } from "node:child_process"
 
@@ -46,6 +46,25 @@ async function getPackedTarballPath() {
   return join(tmpDir, tgzFiles[tgzFiles.length - 1])
 }
 
+async function installFreshTarball(tarballPath) {
+  const lockPath = join(smokeDir, "package-lock.json")
+  const originalLock = await readFile(lockPath, "utf8")
+  const lock = JSON.parse(originalLock)
+
+  // The packed tarball changes whenever the library does. Drop the pinned
+  // integrity so npm recomputes it instead of failing EINTEGRITY.
+  delete lock.packages?.["node_modules/endnotes"]
+  await writeFile(lockPath, `${JSON.stringify(lock, null, 2)}\n`)
+
+  try {
+    await run("npm", ["install", "--no-audit", "--no-fund"], smokeDir)
+    await run("npm", ["install", tarballPath, "--no-audit", "--no-fund"], smokeDir)
+    await run("npm", ["run", "build"], smokeDir)
+  } finally {
+    await writeFile(lockPath, originalLock)
+  }
+}
+
 async function main() {
   await rm(tmpDir, { recursive: true, force: true })
   await mkdir(tmpDir, { recursive: true })
@@ -54,9 +73,7 @@ async function main() {
   await run("npm", ["pack", "--pack-destination", tmpDir])
 
   const tarballPath = await getPackedTarballPath()
-  await run("npm", ["install"], smokeDir)
-  await run("npm", ["install", tarballPath], smokeDir)
-  await run("npm", ["run", "build"], smokeDir)
+  await installFreshTarball(tarballPath)
 }
 
 main().catch((error) => {
